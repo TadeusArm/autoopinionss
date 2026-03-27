@@ -6,8 +6,10 @@ body, html {
     padding: 0;
     height: 100%;
     font-family: 'Roboto', sans-serif;
+    color: white;
 }
 
+/* Fondo por defecto */
 body {
     background: url('../img/fondo_coche.jpg') center/cover no-repeat fixed;
     position: relative;
@@ -23,7 +25,6 @@ body {
     z-index: 1;
 }
 
-/* Tarjeta con efecto Glassmorphism */
 .card {
     position: relative;
     z-index: 2;  
@@ -32,7 +33,7 @@ body {
     background-color: rgba(31, 41, 55, 0.75); 
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 0.5px solid rgba(255, 255, 255, 0.15);
     padding: 2.5rem 2rem;
     border-radius: 16px;
     box-shadow: 0 15px 35px rgba(0,0,0,0.5);
@@ -45,56 +46,16 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-.card h2 {
-    text-align: center;
-    margin-bottom: 0.5rem;
-    font-weight: 700;
-    font-size: 1.8rem;
-    letter-spacing: 1px;
-}
-
-.subtitle {
-    text-align: center;
-    color: #94a3b8;
-    margin-bottom: 2rem;
-    font-size: 0.9rem;
-}
-
-/* Inputs mejorados */
-.input-wrapper {
-    position: relative;
-    margin-bottom: 1.2rem;
-}
-
-.input-wrapper i {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #94a3b8;
-    font-size: 1rem;
-}
-
 input {
     width: 100%; 
-    padding: 0.85rem 0.85rem 0.85rem 2.8rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.85rem;
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     background-color: rgba(55, 65, 81, 0.5);
     color: white;
-    font-size: 1rem;
     box-sizing: border-box;
-    transition: all 0.3s ease;
 }
 
-input:focus {
-    outline: none;
-    background-color: rgba(55, 65, 81, 0.8);
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-}
-
-/* Botones */
 button {
     width: 100%;
     padding: 0.9rem;
@@ -103,46 +64,16 @@ button {
     background: linear-gradient(135deg, #2563eb, #1d4ed8);
     color: white;
     font-weight: bold;
-    font-size: 1rem;
     cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
 }
 
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+/* Estilos para el vehiculo en comments */
+.vehicle-card {
+    background: rgba(31, 41, 55, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 0.5px solid rgba(255,255,255,0.1);
+    color: white;
 }
-
-/* Alertas de Mensajes */
-.alert {
-    padding: 12px;
-    border-radius: 10px;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    font-size: 0.9rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.alert-error {
-    background-color: rgba(239, 68, 68, 0.15);
-    color: #fca5a5;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.alert-success {
-    background-color: rgba(34, 197, 94, 0.15);
-    color: #86efac;
-    border: 1px solid rgba(34, 197, 94, 0.3);
-}
-
-.text-center { text-align: center; color: #cbd5e1; }
-.text-center a { color: #3b82f6; text-decoration: none; font-weight: 500; }
-.text-center a:hover { text-decoration: underline; }

@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="overlay"></div>
     <div class="card">
         <h2><i class="fa-solid fa-user-plus"></i> Registro</h2>
-        <p class="subtitle">Únete a nuestra comunidad motor</p>
+        <p class="subtitle">Únete a nuestra comunidad del motor</p>
 
         <?php if($message): ?>
             <?php $class = (strpos($message, 'Error') !== false) ? 'alert-error' : 'alert-success'; ?>
