@@ -25,7 +25,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit;
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -34,18 +33,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+    <?php include 'includes/header.php'; ?>
     <div class="overlay"></div>
-    <div class="card">
+    
+    <div class="card" style="margin-top: 50px;">
         <h2>Nuevo Vehículo</h2>
         <form method="POST" enctype="multipart/form-data">
             <input type="text" name="brand" placeholder="Marca" required style="margin-bottom:10px;">
             <input type="text" name="model" placeholder="Modelo" required style="margin-bottom:10px;">
             <input type="number" name="year" placeholder="Año" required style="margin-bottom:10px;">
             <textarea name="description" placeholder="Descripción..." required style="width:100%; height:80px; margin-bottom:10px;"></textarea>
-            <input type="file" name="image" accept="image/*" style="margin-bottom:15px;">
+            <input type="file" name="image" accept="image/*" style="margin-bottom:15px; background: transparent; border: none;">
             <button type="submit">Publicar Coche</button>
         </form>
-        <p style="text-align:center; margin-top:15px;"><a href="index.php" style="color:white;">Cancelar</a></p>
+        <p style="text-align:center; margin-top:15px;"><a href="index.php" style="color:white; text-decoration:none; opacity: 0.7;">Cancelar</a></p>
     </div>
 </body>
 </html>
