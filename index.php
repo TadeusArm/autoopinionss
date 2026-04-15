@@ -51,7 +51,7 @@ $coches = $query->fetchAll();
             overflow: hidden;
             border-radius: 12px;
             margin: 12px 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 0px solid rgba(255, 255, 255, 0.1);
             background: rgba(0, 0, 0, 0.3);
         }
 
@@ -67,7 +67,7 @@ $coches = $query->fetchAll();
             padding: 8px 12px;
             border-radius: 8px;
             display: inline-block;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 0px solid rgba(255, 255, 255, 0.1);
             font-size: 0.85rem;
             margin-bottom: 8px;
         }
@@ -94,7 +94,7 @@ $coches = $query->fetchAll();
             border-radius: 10px;
             text-decoration: none;
             font-weight: bold;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 0px solid rgba(255, 255, 255, 0.1);
             font-size: 0.95rem;
         }
 

@@ -54,7 +54,7 @@ $lista = $st_l->fetchAll();
             backdrop-filter: blur(12px); 
             padding: 25px; 
             border-radius: 12px; 
-            border: 1px solid rgba(255,255,255,0.15); 
+            border: 0px solid rgba(255,255,255,0.15); 
             margin-bottom: 25px; 
             color: white;
         }
@@ -66,7 +66,7 @@ $lista = $st_l->fetchAll();
             border-radius: 8px; 
             font-weight: bold; 
             display: inline-block; 
-            border: 1px solid rgba(239,68,68,0.3);
+            border: 0px solid rgba(239,68,68,0.3);
             margin-bottom: 20px;
             transition: 0.3s;
         }
@@ -108,9 +108,9 @@ $lista = $st_l->fetchAll();
         </div>
 
         <div class="bloque-glass" id="leer">
-            <h3 style="margin-top:0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Opiniones de la comunidad</h3>
+            <h3 style="margin-top:0; border-bottom: 0px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Opiniones de la comunidad</h3>
             <?php foreach($lista as $l): ?>
-                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding: 15px 0;">
+                <div style="border-bottom: 0px solid rgba(255,255,255,0.05); padding: 15px 0;">
                     <strong style="color: #60a5fa;">@<?php echo htmlspecialchars($l['username']); ?></strong>
                     <p style="margin: 8px 0; color: #e2e8f0;"><?php echo nl2br(htmlspecialchars($l['content'])); ?></p>
                 </div>

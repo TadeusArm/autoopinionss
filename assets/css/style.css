@@ -1,166 +1,264 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
 
-   @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+/* --- Reset y Base --- */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Roboto', sans-serif;
+    color: white;
+}
 
-   body, html {
-       margin: 0;
-       padding: 0;
-       height: 100%;
-       font-family: 'Roboto', sans-serif;
-       color: white;
-   }
-   
-   body {
-       background: url('../img/fondo_coche.jpg') center/cover no-repeat fixed;
-       position: relative;
-   }
-   
-   
-   .overlay {
-       position: fixed;  
-       top: 0;
-       left: 0;
-       width: 100%;
-       height: 100%;
-       background-color: rgba(0, 0, 0, 0.65);
-       z-index: 1;
-   }
-   
-   
-   .nav-header {
-       position: sticky;
-       top: 0;
-       z-index: 1000;
-       background: rgba(17, 24, 39, 0.8); 
-       backdrop-filter: blur(15px);
-       -webkit-backdrop-filter: blur(15px);
-       display: flex;
-       justify-content: space-between;
-       align-items: center;
-       padding: 1rem 5%;
-       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-   }
-   
-   .nav-logo {
-       font-size: 1.4rem;
-       font-weight: 800;
-       color: #3b82f6;
-       text-decoration: none;
-       letter-spacing: 1px;
-       text-transform: uppercase;
-   }
-   
-   .nav-links {
-       display: flex;
-       gap: 20px;
-   }
-   
-   .nav-links a {
-       color: #cbd5e1;
-       text-decoration: none;
-       font-weight: 500;
-       font-size: 0.95rem;
-       transition: all 0.3s ease;
-       padding: 8px 12px;
-       border-radius: 8px;
-   }
-   
-   .nav-links a:hover {
-       color: white;
-       background: rgba(255, 255, 255, 0.05);
-   }
-   
-   
-   .nav-links a.btn-salir {
-       color: #fca5a5;
-       border: 1px solid rgba(239, 68, 68, 0.3);
-   }
-   
-   .nav-links a.btn-salir:hover {
-       background: rgba(239, 68, 68, 0.2);
-       color: #ffffff;
-   }
-   
-   
-   .card {
-       position: relative;
-       z-index: 2;  
-       max-width: 400px;
-       margin: 8% auto;
-       background-color: rgba(31, 41, 55, 0.75); 
-       backdrop-filter: blur(12px);
-       -webkit-backdrop-filter: blur(12px);
-       border: 0.5px solid rgba(255, 255, 255, 0.15);
-       padding: 2.5rem 2rem;
-       border-radius: 16px;
-       box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-       color: white;
-       animation: fadeIn 0.8s ease forwards;
-   }
-   
-   
-   .vehicle-card {
-       position: relative;
-       z-index: 2;
-       background: rgba(31, 41, 55, 0.8);
-       backdrop-filter: blur(10px);
-       -webkit-backdrop-filter: blur(10px);
-       border-radius: 15px;
-       padding: 2rem;
-       margin-bottom: 2rem;
-       border: 0.5px solid rgba(255,255,255,0.1);
-       color: white;
-       box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-   }
-   
-   @keyframes fadeIn {
-       from { opacity: 0; transform: translateY(10px); }
-       to { opacity: 1; transform: translateY(0); }
-   }
-   
-   input, textarea {
-       width: 100%; 
-       padding: 0.85rem;
-       border: 0.5px solid rgba(255, 255, 255, 0.1);
-       border-radius: 10px;
-       background-color: rgba(55, 65, 81, 0.5);
-       color: white;
-       box-sizing: border-box;
-       font-family: inherit;
-   }
-   
-   input:focus, textarea:focus {
-       outline: none;
-       border-color: #3b82f6;
-       background-color: rgba(55, 65, 81, 0.7);
-   }
-   
-   button, .btn-submit {
-       width: 100%;
-       padding: 0.9rem;
-       border-radius: 10px;
-       border: none;
-       background: linear-gradient(135deg, #2563eb, #1d4ed8);
-       color: white;
-       font-weight: bold;
-       cursor: pointer;
-       transition: transform 0.2s;
-   }
-   
-   button:hover {
-       transform: translateY(-2px);
-       box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
-   }
-   
-  
-   @media (max-width: 600px) {
-       .nav-header {
-           flex-direction: column;
-           padding: 15px;
-           gap: 15px;
-           text-align: center;
-       }
-       .nav-links {
-           gap: 10px;
-       }
-   }
+body {
+    background: url('../img/fondo_coche.jpg') center/cover no-repeat fixed;
+    position: relative;
+}
+
+.overlay {
+    position: fixed;  
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.65);
+    z-index: 1;
+}
+
+/* 
+   HEADER MINIMALISTA Y ALINEADO
+    */
+.nav-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(17, 24, 39, 0.85); 
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 0;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 4%;
+    display: flex;
+    justify-content: space-between; /* Separa los 3 bloques */
+    align-items: center;
+}
+
+/* Bloque Izquierda: Logo */
+.nav-left {
+    flex: 1; 
+    display: flex;
+    justify-content: flex-start;
+}
+
+.nav-logo {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 900;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Bloque Centro: Navegación */
+.nav-links {
+    flex: 1; 
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.nav-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    border-radius: 10px;
+    transition: 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-links a.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: white;
+}
+
+/* Bloque Derecha: Perfil */
+.nav-right {
+    flex: 1; 
+    display: flex;
+    justify-content: flex-end;
+}
+
+.profile-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 4px 4px 4px 15px;
+    border-radius: 30px;
+    border: 0px solid rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.profile-pill:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+    transform: translateY(-1px);
+}
+
+.user-pill-name {
+    color: #f8fafc;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.user-avatar-small {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 900;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
+
+/* 
+   CARDS Y CONTENIDO
+    */
+.card, .vehicle-card {
+    position: relative;
+    z-index: 2; 
+    background-color: rgba(31, 41, 55, 0.7); 
+    backdrop-filter: blur(15px);
+    border: 0px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+}
+
+.card {
+    max-width: 400px;
+    margin: 5% auto;
+    padding: 2.5rem 2rem;
+}
+
+.vehicle-card {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+input, textarea {
+    width: 100%; 
+    padding: 0.9rem;
+    border: 0px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    background-color: rgba(17, 24, 39, 0.4);
+    color: white;
+    box-sizing: border-box;
+}
+
+button, .btn-submit {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+}
+
+/* Ajustes Responsive */
+@media (max-width: 768px) {
+    .user-pill-name { display: none; }
+    .header-container { padding: 0 15px; }
+}
+
+@media (max-width: 600px) {
+    .nav-links { display: none; } /* Ocultar links en móvil muy pequeño */
+}
+.text-center {
+    text-align: center;
+}
+
+.subtitle {
+    display: block;
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin-bottom: 2rem;
+    font-weight: 400;
+}
+
+.input-group {
+    margin-bottom: 1.2rem;
+}
+
+/* Ajuste de inputs sin iconos */
+input {
+    width: 100%;
+    padding: 1rem; /* Aumentamos un poco el padding para que sea más cómodo */
+    font-size: 0.95rem;
+    transition: background 0.3s, transform 0.2s;
+}
+
+input:focus {
+    background-color: rgba(17, 24, 39, 0.6);
+    outline: none;
+    transform: scale(1.01);
+}
+
+.text-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+.text-footer a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.text-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Estilo de Alertas (Sin iconos) */
+.alert {
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.alert-error {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+}
+
+.alert-success {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+}
