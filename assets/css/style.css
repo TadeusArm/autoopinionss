@@ -14,6 +14,10 @@ body {
     position: relative;
 }
 
+*, *::before, *::after {
+    box-sizing: border-box; /* Asegura que paddings no rompan el ancho en móvil */
+}
+
 .overlay {
     position: fixed;  
     top: 0;
@@ -24,9 +28,7 @@ body {
     z-index: 1;
 }
 
-/* 
-   HEADER MINIMALISTA Y ALINEADO
-    */
+/* HEADER MINIMALISTA Y ALINEADO */
 .nav-header {
     position: sticky;
     top: 0;
@@ -47,11 +49,9 @@ body {
     align-items: center;
 }
 
-/* 2. Aseguramos que los bloques laterales ocupen su espacio */
 .nav-left, .nav-right {
     flex: 1; 
 }
-
 
 .nav-links {
     flex: 2; 
@@ -60,15 +60,8 @@ body {
     gap: 20px;
 }
 
-/* 4.  que el perfil se vea más pegado a la derecha */
-.nav-right {
-    display: flex;
-    justify-content: flex-end;
-}
-
 /* Bloque Izquierda: Logo */
 .nav-left {
-    flex: 1; 
     display: flex;
     justify-content: flex-start;
 }
@@ -83,13 +76,6 @@ body {
 }
 
 /* Bloque Centro: Navegación */
-.nav-links {
-    flex: 1; 
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-}
-
 .nav-links a {
     color: #94a3b8;
     text-decoration: none;
@@ -112,7 +98,6 @@ body {
 
 /* Bloque Derecha: Perfil */
 .nav-right {
-    flex: 1; 
     display: flex;
     justify-content: flex-end;
 }
@@ -155,9 +140,7 @@ body {
     box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
 }
 
-/* 
-   CARDS Y CONTENIDO
-    */
+/* CARDS Y CONTENIDO */
 .card, .vehicle-card {
     position: relative;
     z-index: 2; 
@@ -172,6 +155,7 @@ body {
     max-width: 400px;
     margin: 5% auto;
     padding: 2.5rem 2rem;
+    width: 90%; /* Para que no toque los bordes en móvil */
 }
 
 .vehicle-card {
@@ -186,7 +170,14 @@ input, textarea {
     border-radius: 12px;
     background-color: rgba(17, 24, 39, 0.4);
     color: white;
-    box-sizing: border-box;
+    font-size: 0.95rem;
+    transition: background 0.3s, transform 0.2s;
+}
+
+input:focus {
+    background-color: rgba(17, 24, 39, 0.6);
+    outline: none;
+    transform: scale(1.01);
 }
 
 button, .btn-submit {
@@ -206,139 +197,65 @@ button:hover {
     box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
 }
 
-/* Ajustes Responsive */
+.text-center { text-align: center; }
+.subtitle { display: block; font-size: 0.9rem; color: #94a3b8; margin-bottom: 2rem; font-weight: 400; }
+.input-group { margin-bottom: 1.2rem; }
+.text-footer { text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: #94a3b8; }
+.text-footer a { color: #3b82f6; text-decoration: none; font-weight: 700; }
+.text-footer a:hover { text-decoration: underline; }
+
+/* Estilo de Alertas */
+.alert { padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.85rem; text-align: center; }
+.alert-error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; }
+.alert-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
+
+/* Search Section */
+.search-section { max-width: 1200px; margin: 30px auto; padding: 0 4%; }
+.search-form { display: flex; gap: 15px; background: rgba(31, 41, 55, 0.6); padding: 15px; border-radius: 20px; backdrop-filter: blur(10px); align-items: center; }
+.search-box { flex: 2; }
+.filter-box { flex: 1; }
+.search-form input, .search-form select { background: rgba(17, 24, 39, 0.4); border: 0px; color: white; padding: 12px; border-radius: 12px; width: 100%; }
+.btn-search { flex: 0.5; padding: 12px; background: #3b82f6; border: none; border-radius: 12px; color: white; font-weight: 700; cursor: pointer; transition: 0.3s; }
+.btn-search:hover { background: #2563eb; transform: translateY(-2px); }
+.btn-clear { color: #94a3b8; text-decoration: none; font-size: 0.85rem; padding: 0 10px; }
+
+/* Ajustes Responsive Básicos */
 @media (max-width: 768px) {
     .user-pill-name { display: none; }
     .header-container { padding: 0 15px; }
+    .search-form { flex-direction: column; }
+    .search-box, .filter-box, .btn-search { width: 100%; }
 }
 
 @media (max-width: 600px) {
     .nav-links { display: none; }
 }
-.text-center {
-    text-align: center;
-}
-
-.subtitle {
-    display: block;
-    font-size: 0.9rem;
-    color: #94a3b8;
-    margin-bottom: 2rem;
-    font-weight: 400;
-}
-
-.input-group {
-    margin-bottom: 1.2rem;
-}
-
-
-input {
-    width: 100%;
-    padding: 1rem; 
-    font-size: 0.95rem;
-    transition: background 0.3s, transform 0.2s;
-}
-
-input:focus {
-    background-color: rgba(17, 24, 39, 0.6);
-    outline: none;
-    transform: scale(1.01);
-}
-
-.text-footer {
-    text-align: center;
-    margin-top: 1.5rem;
-    font-size: 0.85rem;
-    color: #94a3b8;
-}
-
-.text-footer a {
-    color: #3b82f6;
-    text-decoration: none;
-    font-weight: 700;
-}
-
-.text-footer a:hover {
-    text-decoration: underline;
-}
-
-/* Estilo de Alertas (Sin iconos) */
-.alert {
-    padding: 1rem;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    font-size: 0.85rem;
-    text-align: center;
-}
-
-.alert-error {
-    background: rgba(239, 68, 68, 0.15);
-    color: #fca5a5;
-}
-
-.alert-success {
-    background: rgba(34, 197, 94, 0.15);
-    color: #4ade80;
-}
-.search-section {
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 0 4%;
-}
-
-.search-form {
-    display: flex;
-    gap: 15px;
-    background: rgba(31, 41, 55, 0.6);
-    padding: 15px;
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-    align-items: center;
-}
-
-.search-box { flex: 2; }
-.filter-box { flex: 1; }
-
-.search-form input, 
-.search-form select {
-    background: rgba(17, 24, 39, 0.4);
-    border: 0px; 
-    color: white;
-    padding: 12px;
-    border-radius: 12px;
-    width: 100%;
-}
-
-.btn-search {
-    flex: 0.5;
-    padding: 12px;
-    background: #3b82f6;
-    border: none;
-    border-radius: 12px;
-    color: white;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.btn-search:hover {
-    background: #2563eb;
-    transform: translateY(-2px);
-}
-
-.btn-clear {
-    color: #94a3b8;
-    text-decoration: none;
-    font-size: 0.85rem;
-    padding: 0 10px;
-}
-
-
+/* === ALTERNATIVA: PUBLICAR SIEMPRE VISIBLE EN MÓVIL === */
 @media (max-width: 768px) {
-    .search-form {
-        flex-direction: column;
+    /* 1. Mantenemos el contenedor de enlaces activo */
+    .nav-links {
+        display: flex !important;
+        gap: 10px;
     }
-    .search-box, .filter-box, .btn-search {
-        width: 100%;
+
+    /* 2. Escondemos TODOS los enlaces del menú por defecto */
+    .nav-links a {
+        display: none;
+    }
+
+    /* 3. Forzamos que solo el SEGUNDO enlace (Publicar) sea visible */
+    .nav-links a:nth-child(2) {
+        display: block;
+        background: #3b82f6; /* Color azul para que resalte como botón */
+        color: white !important;
+        padding: 8px 15px !important;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: bold;
+    }
+
+    /* 4. Ajuste opcional: esconder el nombre del usuario para que no choque */
+    .user-pill-name {
+        display: none;
     }
 }

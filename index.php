@@ -9,6 +9,7 @@ if(!isset($_SESSION['user_id'])){
 
 $user_id = $_SESSION['user_id'];
 
+// 1. CAPTURAR FILTROS
 $search = $_GET['search'] ?? '';
 $brand_filter = $_GET['brand'] ?? '';
 $min_year = $_GET['min_year'] ?? '';
@@ -40,23 +41,20 @@ $coches = $stmt->fetchAll();
 $marcas_query = $pdo->query("SELECT DISTINCT brand FROM vehicles WHERE brand != '' ORDER BY brand ASC");
 $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>AutoOpinions - Muro</title>
     <link rel="stylesheet" href="assets/css/style.css">
-    
     <style>
-        /* Fondo y reseteo */
         body { 
             background: url('assets/img/fondo-index.jpg') center/cover no-repeat fixed !important; 
             margin: 0;
             padding: 0;
         }
 
-        /* HEADER FIX PARA EVITAR HUECOS BLANCOS */
         header {
             position: fixed;
             top: 0;
@@ -64,7 +62,6 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
             z-index: 1000;
         }
 
-        /* SIDEBAR IZQUIERDA */
         .sidebar-left {
             width: 300px;
             background: rgba(15, 23, 42, 0.95);
@@ -75,9 +72,8 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
             position: fixed;
             left: 0;
             top: 0; 
-            padding-top: 100px; 
+            padding-top: 90px; 
             z-index: 900;
-            box-sizing: border-box;
             overflow-y: auto;
         }
 
@@ -91,7 +87,6 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
 
         .filter-group { margin-bottom: 20px; }
         .filter-group label { display: block; color: #94a3b8; font-size: 0.75rem; margin-bottom: 8px; font-weight: bold; }
-        
         .range-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         .sidebar-left input, .sidebar-left select {
@@ -116,74 +111,161 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
             margin-top: 10px;
         }
 
-        /* CONTENEDOR DEL FEED */
         .feed-container {
-    margin-left: 300px; 
-    position: relative;
-    z-index: 2;
-    max-width: 650px; 
-    margin-right: auto;
-    margin-left: auto; 
-    padding: 0 20px;
-    padding-top: 30px !important; 
-    margin-top: 10px !important; 
-}
+            margin-left: 65px; /* Deja el hueco exacto del sidebar */
+            position: relative;
+            z-index: 2;
+            width: auto; /* Ocupa todo el espacio restante de la pantalla */
+            margin-top: 40px; 
+            padding: 0 20px;
+            
+            /* Magia para centrar el contenido en este espacio: */
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+        }
 
-        /* ESTILOS DE CARDS ORIGINALES */
+        /* Evitamos que las tarjetas y títulos se estiren demasiado */
+        .feed-container > * {
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .vehicle-card { 
+            margin-bottom: 40px; 
+            background: rgba(31, 41, 55, 0.7);
+            padding: 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
         .img-wrapper {
             width: 100%;
             height: 300px; 
             overflow: hidden;
             border-radius: 12px;
             margin: 12px 0;
-            border: 0px solid rgba(255, 255, 255, 0.1);
             background: rgba(0, 0, 0, 0.3);
         }
 
-        .img-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+        .img-wrapper img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         .stats-badge {
             background: rgba(0, 0, 0, 0.5);
             padding: 8px 12px;
             border-radius: 8px;
             display: inline-block;
-            border: 0px solid rgba(255, 255, 255, 0.1);
             font-size: 0.85rem;
             margin-bottom: 8px;
         }
 
-        .btn-azul {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
+        .btn-azul, .btn-gris {
             padding: 12px;
             display: block;
             text-align: center;
             border-radius: 10px;
             text-decoration: none;
             font-weight: bold;
-            transition: 0.3s;
             font-size: 0.95rem;
         }
+        .btn-azul { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; }
+        .btn-gris { background: rgba(255, 255, 255, 0.1); color: #cbd5e1; }
 
-        .btn-gris {
-            background: rgba(255, 255, 255, 0.1);
-            color: #cbd5e1;
-            padding: 12px;
-            display: block;
-            text-align: center;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: bold;
-            border: 0px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.95rem;
+/* --- HEADER: Por defecto para PC (Siempre visible) --- */
+.nav-header {
+    position: fixed; /* Cambiado de sticky a fixed para asegurar PC */
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(17, 24, 39, 0.85); 
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 0;
+}
+
+/* --- BOTÓN SUBIR: Oculto por defecto (PC) --- */
+#scrollToTop {
+    display: none ; /* No se verá en PC */
+}
+
+/* === AJUSTES EXCLUSIVOS PARA MÓVIL (Menos de 768px) === */
+@media (max-width: 768px) {
+    
+    .nav-header {
+        position: relative !important; 
+    }
+
+    #scrollToTop#scrollToTop {
+        display: none; 
+        position: fixed !important;
+        bottom: 25px !important;
+        right: 25px !important;
+        width: 55px !important;
+        height: 55px !important;
+        background-image: url('assets/img/flecha.jpg') !important;
+        background-size: cover !important;
+        background-position: center !important;
+        border: none !important;
+        border-radius: 45% ;
+        z-index: 99999 ;
+        
+        /* EFECTO FANTASMA POR DEFECTO */
+        opacity: 0.5 ; 
+        filter: brightness(1);
+        transition: all 0.2s ease-in-out ;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* EFECTO BRILLO AL TOCAR */
+    #scrollToTop#scrollToTop:active {
+        opacity: 0.5t; 
+        filter: brightness(1.8) drop-shadow(0 0 15px #3b82f6) !important; 
+        transform: scale(1.2) !important;
+    }
+}
+
+        /* === CORRECCIONES PARA MÓVIL === */
+        @media (max-width: 768px) {
+            .sidebar-left {
+                position: relative !important; 
+                width: 100% !important;
+                height: auto !important;
+                padding-top: 0px ; 
+                padding-bottom: 20px !important;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .feed-container { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 15px !important; 
+                margin-top: 20px !important; 
+            }
+
+            .range-container { grid-template-columns: 1fr; }
+
+            .img-wrapper {
+                height: 220px; /* Las imágenes no se verán gigantes en móvil */
+            }
+            
+            .vehicle-card {
+                padding: 15px;
+            }
         }
+        /* Dentro de la etiqueta <style> de index.php */
+.feed-container {
+    margin-top: 100px; /* Espacio para que el header fijo no tape el título en PC */
+    /* ... resto de tu código ... */
+}
 
-        .vehicle-card { margin-bottom: 40px; }
+@media (max-width: 768px) {
+    .feed-container {
+        margin-top: 20px !important; /* En móvil, como el header no es fijo, no hace falta tanto margen */
+    }
+}
     </style>
 </head>
 <body>
@@ -210,7 +292,7 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
             </div>
 
             <div class="filter-group">
-                <label>Año (Min - Max)</label>
+                <label>Año (Mín - Máx)</label>
                 <div class="range-container">
                     <select name="min_year">
                         <option value="">Mín</option>
@@ -228,7 +310,7 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
             </div>
 
             <div class="filter-group">
-                <label>Kilómetros (Min - Max)</label>
+                <label>Kilómetros (Mín - Máx)</label>
                 <div class="range-container">
                     <select name="min_km">
                         <option value="">Mín</option>
@@ -251,7 +333,7 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
     </aside>
 
     <div class="feed-container">
-        <h2 style="border-left: 5px solid #3b82f6; padding-left: 15px; margin-bottom: 25px; text-shadow: 2px 2px 5px rgba(0,0,0,0.7); font-size: 1.6rem; color: #fff;">
+        <h2 style="border-left: 5px solid #3b82f6; padding-left: 15px; margin-bottom: 25px; text-shadow: 2px 2px 5px rgba(0,0,0,0.7); font-size: 1.6rem; color: #fff; margin-top: 0;">
             Muro de la Comunidad
         </h2>
 
@@ -265,23 +347,22 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
                     $img_db = $c['image'];
                     $ruta_final = (strpos($img_db, 'assets/') === 0) ? $img_db : "assets/img/vehicles/" . $img_db;
                 ?>
-                
                 <div class="vehicle-card">
                     <div style="display: flex; justify-content: space-between; align-items: baseline;">
                         <div>
                             <span style="color: #9ca3af; font-size: 0.8rem;">Publicado por</span>
-                            <strong style="color: #3b82f6; display: block; font-size: 1rem;">@<?php echo htmlspecialchars($c['username']); ?></strong>
+                            <strong style="color: #3b82f6; display: block; font-size: 1rem;">@<?= htmlspecialchars($c['username']); ?></strong>
                         </div>
-                        <span style="color: #6b7280; font-size: 0.9rem; font-weight: bold;"><?php echo htmlspecialchars($c['year']); ?></span>
+                        <span style="color: #6b7280; font-size: 0.9rem; font-weight: bold;"><?= htmlspecialchars($c['year']); ?></span>
                     </div>
 
                     <h3 style="margin: 10px 0; font-size: 1.6rem; letter-spacing: -0.5px; color: #f8fafc;">
-                        <?php echo htmlspecialchars($c['brand'] . " " . $c['model']); ?>
+                        <?= htmlspecialchars($c['brand'] . " " . $c['model']); ?>
                     </h3>
                     
                     <div class="img-wrapper">
                         <?php if(!empty($img_db)): ?>
-                            <img src="<?php echo htmlspecialchars($ruta_final); ?>" alt="Vehículo">
+                            <img src="<?= htmlspecialchars($ruta_final); ?>" alt="Vehículo">
                         <?php else: ?>
                             <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2);">
                                 <p style="color: #64748b; font-size: 0.9rem;">Imagen no disponible</p>
@@ -289,22 +370,18 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
                         <?php endif; ?>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
-                        <div class="stats-badge" style="color:#fff;">
-                             <span style="color: #fbbf24; font-weight: bold;"><?php echo $c['nota_media'] ? round($c['nota_media'], 1) : '---'; ?></span> 
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px; margin-bottom: 15px;">
+                        <div class="stats-badge" style="color:#fff; margin-bottom: 0;">
+                             <span style="color: #fbbf24; font-weight: bold;"><?= $c['nota_media'] ? round($c['nota_media'], 1) : '---'; ?></span> 
                             <span style="margin: 0 5px; opacity: 0.3;">|</span>
-                             <?php echo $c['total_comentarios']; ?> opiniones
+                             <?= $c['total_comentarios']; ?> opiniones
                         </div>
                     </div>
 
                     <?php if($ya_opino): ?>
-                        <a href="comments.php?vehicle_id=<?php echo $c['id']; ?>#leer" class="btn-gris">
-                            Ver opiniones (Participado)
-                        </a>
+                        <a href="comments.php?vehicle_id=<?= $c['id']; ?>#leer" class="btn-gris">Ver opiniones (Participado)</a>
                     <?php else: ?>
-                        <a href="comments.php?vehicle_id=<?php echo $c['id']; ?>" class="btn-azul">
-                            Opinar y ver detalles
-                        </a>
+                        <a href="comments.php?vehicle_id=<?= $c['id']; ?>" class="btn-azul">Opinar y ver detalles</a>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
@@ -313,5 +390,27 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
         <?php endif; ?>
     </div>
 
+    <button type="button" id="scrollToTop" title="Ir arriba"></button>
+
+    <script>
+      const scrollBtn = document.getElementById("scrollToTop");
+    
+    window.onscroll = function() {
+        const isMobile = window.innerWidth <= 768;
+        const dist = document.body.scrollTop > 300 || document.documentElement.scrollTop > 300;
+
+        // Solo manejamos si existe o no en el DOM, el estilo lo pone el CSS
+        if (isMobile && dist) {
+            scrollBtn.style.display = "block";
+        } else {
+            scrollBtn.style.display = "none";
+        }
+    };
+
+    scrollBtn.onclick = function() {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    </script>
+   
 </body>
 </html>
