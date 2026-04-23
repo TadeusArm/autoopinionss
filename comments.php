@@ -1,8 +1,16 @@
 <?php
 session_start();
 include 'config/db.php';
-// Asegúrate de tener este archivo para el email
 require_once 'includes/functions_mail.php'; 
+
+// --- CONFIGURACIÓN PARA HOSTING (CONSEJO PRO) ---
+$modo_hosting = false; // Cambiar a true al subir al servidor real
+if ($modo_hosting) {
+    error_reporting(0);
+    ini_set('display_errors', 0);
+} else {
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+}
 
 if(!isset($_SESSION['user_id']) || !isset($_GET['vehicle_id'])){
     header("Location: index.php");
@@ -17,11 +25,50 @@ $check = $pdo->prepare("SELECT id FROM comments WHERE user_id = ? AND vehicle_id
 $check->execute([$mi_id, $coche_id]);
 $ya_he_opinado = $check->fetch();
 
+// --- LÓGICA DE INSERCIÓN Y EMAIL ---
 if ($_SERVER["REQUEST_METHOD"] == "POST" && !$ya_he_opinado) {
-    // Aquí iría tu lógica de inserción (estrellas y comentario) y envío de email
-    // ...
-    header("Location: comments.php?vehicle_id=$coche_id#leer");
-    exit;
+    $nota = $_POST['nota'] ?? null;
+    $comentario = trim($_POST['comentario'] ?? '');
+
+    if ($nota && !empty($comentario)) {
+        try {
+            $pdo->beginTransaction();
+
+            // Insertar comentario
+            $ins_comm = $pdo->prepare("INSERT INTO comments (user_id, vehicle_id, content) VALUES (?, ?, ?)");
+            $ins_comm->execute([$mi_id, $coche_id, $comentario]);
+
+            // Insertar estrellas (rating)
+            $ins_rate = $pdo->prepare("INSERT INTO ratings (user_id, vehicle_id, rating) VALUES (?, ?, ?)");
+            $ins_rate->execute([$mi_id, $coche_id, $nota]);
+
+            $pdo->commit();
+
+            // Envío de email (Tu función real)
+            try {
+                $st_owner = $pdo->prepare("SELECT v.brand, v.model, u.email, u.username FROM vehicles v JOIN users u ON v.user_id = u.id WHERE v.id = ?");
+                $st_owner->execute([$coche_id]);
+                $owner = $st_owner->fetch();
+
+                if($owner) {
+                    enviarNotificacionEmail(
+                        $owner['email'], 
+                        $owner['username'], 
+                        'comment', 
+                        $owner['brand'] . " " . $owner['model']
+                    );
+                }
+            } catch (Exception $e_mail) {
+                // El mail falla en local (XAMPP), pero el proceso sigue
+            }
+
+            header("Location: comments.php?vehicle_id=$coche_id#leer");
+            exit;
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            if (!$modo_hosting) die("Error al guardar: " . $e->getMessage());
+        }
+    }
 }
 
 // Obtener datos del coche
@@ -29,7 +76,7 @@ $st_c = $pdo->prepare("SELECT v.*, u.username FROM vehicles v JOIN users u ON v.
 $st_c->execute([$coche_id]);
 $c = $st_c->fetch();
 
-// Lista de comentarios con JOIN a ratings (para tener la nota)
+// Lista de comentarios con JOIN a ratings
 $st_l = $pdo->prepare("
     SELECT c.*, u.username, r.rating 
     FROM comments c 
@@ -55,7 +102,7 @@ $lista = $st_l->fetchAll();
         }
 
         .contenedor-comentarios { 
-            max-width: 800px; /* Un poco más ancho para la preview lateral */
+            max-width: 800px; 
             margin: 0 auto; 
             padding: 20px; 
             position: relative; 
@@ -63,7 +110,7 @@ $lista = $st_l->fetchAll();
         }
 
         .bloque-glass { 
-            background: rgba(17, 24, 39, 0.75); /* Un poco más oscuro para mejor contraste */
+            background: rgba(17, 24, 39, 0.75); 
             backdrop-filter: blur(16px); 
             -webkit-backdrop-filter: blur(16px);
             padding: 25px; 
@@ -73,7 +120,6 @@ $lista = $st_l->fetchAll();
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* --- NUEVO: PREVISUALIZACIÓN DEL COCHE --- */
         .coche-preview-header {
             display: flex;
             gap: 20px;
@@ -81,18 +127,17 @@ $lista = $st_l->fetchAll();
         }
 
         .img-preview {
-            width: 150px; /* Tamaño de la miniatura en PC */
+            width: 150px; 
             height: 100px;
             object-fit: cover;
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.2);
-            flex-shrink: 0; /* Evita que se encoja */
+            flex-shrink: 0; 
             cursor: pointer;
             transition: 0.3s;
         }
         .img-preview:hover { transform: scale(1.05); }
 
-        /* Botón de volver con estilo Glass */
         .btn-volver { 
             background: rgba(239, 68, 68, 0.15); 
             color: #fca5a5; 
@@ -108,7 +153,6 @@ $lista = $st_l->fetchAll();
         }
         .btn-volver:hover { background: rgba(239,68,68,0.3); color: white; }
 
-        /* Estrellas Interactivas */
         .rating-stars { display: flex; flex-direction: row-reverse; justify-content: flex-end; margin: 10px 0; }
         .rating-stars input { display: none; }
         .rating-stars label {
@@ -133,7 +177,6 @@ $lista = $st_l->fetchAll();
             background: #10b981; color: white; font-weight: bold; font-size: 1rem; cursor: pointer;
         }
 
-        /* Responsive Móvil */
         @media (max-width: 768px) {
             .contenedor-comentarios { padding: 10px; }
             .bloque-glass { 
@@ -142,7 +185,7 @@ $lista = $st_l->fetchAll();
                 padding: 15px;
             }
             .coche-preview-header { flex-direction: column; text-align: center; }
-            .img-preview { width: 100%; height: 180px; } /* Banner en móvil */
+            .img-preview { width: 100%; height: 180px; } 
             h2 { font-size: 1.5rem; }
             .rating-stars label { font-size: 3rem; }
             .btn-volver { width: 100%; text-align: center; box-sizing: border-box; }
@@ -157,29 +200,27 @@ $lista = $st_l->fetchAll();
         <a href="index.php" class="btn-volver">← Volver al Muro</a>
 
         <div class="bloque-glass">
-    <div class="coche-preview-header">
-        <?php if($c['image']): ?>
-            <a href="assets/img/vehicles/<?php echo htmlspecialchars($c['image']); ?>" target="_blank">
-                <img src="assets/img/vehicles/<?php echo htmlspecialchars($c['image']); ?>" 
-                     class="img-preview" 
-                     alt="Coche"
-                     onerror="this.src='https://via.placeholder.com/150x100?text=AutoOpinions';">
-            </a>
-        <?php else: ?>
-            <img src="assets/img/no-foto.webp" class="img-preview" alt="Sin foto">
-        <?php endif; ?>
-        
-        <div>
-            <h2 style="margin:0; color: #60a5fa;"><?php echo htmlspecialchars($c['brand']." ".$c['model']); ?></h2>
-            <p style="color: #9ca3af; margin: 5px 0;">Publicado por: <b>@<?php echo htmlspecialchars($c['username']); ?></b></p>
-            <p style="line-height: 1.5; margin-top: 10px; font-size: 0.9rem; color: #d1d5db;">
-                <?php 
-                echo nl2br(htmlspecialchars(mb_strimwidth($c['description'], 0, 150, "..."))); 
-                ?>
-            </p>
+            <div class="coche-preview-header">
+                <?php if($c['image']): ?>
+                    <a href="assets/img/vehicles/<?php echo htmlspecialchars($c['image']); ?>" target="_blank">
+                        <img src="assets/img/vehicles/<?php echo htmlspecialchars($c['image']); ?>" 
+                             class="img-preview" 
+                             alt="Coche"
+                             onerror="this.src='https://via.placeholder.com/150x100?text=AutoOpinions';">
+                    </a>
+                <?php else: ?>
+                    <img src="assets/img/no-foto.webp" class="img-preview" alt="Sin foto">
+                <?php endif; ?>
+                
+                <div>
+                    <h2 style="margin:0; color: #60a5fa;"><?php echo htmlspecialchars($c['brand']." ".$c['model']); ?></h2>
+                    <p style="color: #9ca3af; margin: 5px 0;">Publicado por: <b>@<?php echo htmlspecialchars($c['username']); ?></b></p>
+                    <p style="line-height: 1.5; margin-top: 10px; font-size: 0.9rem; color: #d1d5db;">
+                        <?php echo nl2br(htmlspecialchars(mb_strimwidth($c['description'], 0, 150, "..."))); ?>
+                    </p>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
         <div class="bloque-glass">
             <?php if($ya_he_opinado): ?>
