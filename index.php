@@ -351,7 +351,9 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
                     <div style="display: flex; justify-content: space-between; align-items: baseline;">
                         <div>
                             <span style="color: #9ca3af; font-size: 0.8rem;">Publicado por</span>
-                            <strong style="color: #3b82f6; display: block; font-size: 1rem;">@<?= htmlspecialchars($c['username']); ?></strong>
+                            <a href="profile.php?id=<?= $c['user_id']; ?>" style="text-decoration: none;">
+    <strong style="color: #3b82f6; display: block; font-size: 1rem;">@<?= htmlspecialchars($c['username']); ?></strong>
+</a>
                         </div>
                         <span style="color: #6b7280; font-size: 0.9rem; font-weight: bold;"><?= htmlspecialchars($c['year']); ?></span>
                     </div>
