@@ -7,6 +7,12 @@
         <nav class="nav-links">
             <a href="index.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>">Explorar</a>
             <a href="add_vehicle.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'add_vehicle.php' ? 'active' : ''; ?>">Publicar</a>
+            
+            <?php if(isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                <a href="admin.php" class="nav-admin-link <?php echo basename($_SERVER['PHP_SELF']) == 'admin.php' ? 'active' : ''; ?>" style="color: #fbbf24; font-weight: bold; border: 1px solid rgba(251, 191, 36, 0.3); padding: 5px 12px; border-radius: 8px; background: rgba(251, 191, 36, 0.1);">
+                     Admin
+                </a>
+            <?php endif; ?>
         </nav>
 
         <div class="nav-right">
@@ -24,3 +30,12 @@
         </div>
     </div>
 </header>
+
+<style>
+    /* Estilo extra para que el botón de admin brille un poco al pasar el ratón */
+    .nav-admin-link:hover {
+        background: rgba(251, 191, 36, 0.2) !important;
+        box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
+        color: white !important;
+    }
+</style>

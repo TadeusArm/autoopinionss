@@ -7,17 +7,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Seleccionamos también la columna profile_pic
-    $stmt = $pdo->prepare("SELECT id, username, password, profile_pic FROM users WHERE email = ?");
+    // 1. Añadimos 'role' a la consulta SQL
+    $stmt = $pdo->prepare("SELECT id, username, password, profile_pic, role FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
     if($user && password_verify($password, $user['password'])){
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
-        
-        // Guardamos la foto en la sesión al entrar
         $_SESSION['profile_pic'] = $user['profile_pic']; 
+        
+        // 2. Guardamos el rol en la sesión para que el panel de admin sepa quién eres
+        $_SESSION['role'] = $user['role']; 
         
         header("Location: index.php");
         exit;
@@ -25,7 +26,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $message = "Email o contraseña incorrectos";
     }
 }
-?>
 ?>
 <!DOCTYPE html>
 <html lang="es">
