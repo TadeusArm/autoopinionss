@@ -9,7 +9,7 @@ if(!isset($_SESSION['user_id'])){
 
 $user_id = $_SESSION['user_id'];
 
-// 1. CAPTURAR FILTROS
+// 1. CAPTURAR TODOS LOS FILTROS DEL INDEX
 $search = $_GET['search'] ?? '';
 $brand_filter = $_GET['brand'] ?? '';
 $min_year = $_GET['min_year'] ?? '';
@@ -17,21 +17,42 @@ $max_year = $_GET['max_year'] ?? '';
 $min_km = $_GET['min_km'] ?? '';
 $max_km = $_GET['max_km'] ?? '';
 
-// 2. SQL DINÁMICO
+// 2. SQL DINÁMICO (Clon del index + Filtro Seguidores)
 $sql = "SELECT v.*, u.username, 
         (SELECT COUNT(*) FROM comments WHERE vehicle_id = v.id) as total_comentarios,
         (SELECT AVG(rating) FROM ratings WHERE vehicle_id = v.id) as nota_media
         FROM vehicles v 
         JOIN users u ON v.user_id = u.id 
-        WHERE 1=1"; 
+        JOIN follows f ON v.user_id = f.followed_id 
+        WHERE f.follower_id = ?"; 
 
-$params = [];
-if (!empty($search)) { $sql .= " AND (v.brand LIKE ? OR v.model LIKE ?)"; $params[] = "%$search%"; $params[] = "%$search%"; }
-if (!empty($brand_filter)) { $sql .= " AND v.brand = ?"; $params[] = $brand_filter; }
-if (!empty($min_year)) { $sql .= " AND v.year >= ?"; $params[] = (int)$min_year; }
-if (!empty($max_year)) { $sql .= " AND v.year <= ?"; $params[] = (int)$max_year; }
-if (!empty($min_km)) { $sql .= " AND v.km >= ?"; $params[] = (int)$min_km; }
-if (!empty($max_km)) { $sql .= " AND v.km <= ?"; $params[] = (int)$max_km; }
+$params = [$user_id]; 
+
+if (!empty($search)) { 
+    $sql .= " AND (v.brand LIKE ? OR v.model LIKE ?)"; 
+    $params[] = "%$search%"; 
+    $params[] = "%$search%"; 
+}
+if (!empty($brand_filter)) { 
+    $sql .= " AND v.brand = ?"; 
+    $params[] = $brand_filter; 
+}
+if (!empty($min_year)) { 
+    $sql .= " AND v.year >= ?"; 
+    $params[] = (int)$min_year; 
+}
+if (!empty($max_year)) { 
+    $sql .= " AND v.year <= ?"; 
+    $params[] = (int)$max_year; 
+}
+if (!empty($min_km)) { 
+    $sql .= " AND v.km >= ?"; 
+    $params[] = (int)$min_km; 
+}
+if (!empty($max_km)) { 
+    $sql .= " AND v.km <= ?"; 
+    $params[] = (int)$max_km; 
+}
 
 $sql .= " ORDER BY v.id DESC";
 $stmt = $pdo->prepare($sql);
@@ -46,21 +67,15 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-    <title>AutoOpinions - Muro</title>
+    <title>AutoOpinions - Siguiendo</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
         body { 
             background: url('assets/img/fondo-index.jpg') center/cover no-repeat fixed !important; 
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
         }
 
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
+        header { position: fixed; top: 0; width: 100%; z-index: 1000; }
 
         .sidebar-left {
             width: 300px;
@@ -70,8 +85,7 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
             padding: 30px 20px;
             height: 100vh;
             position: fixed;
-            left: 0;
-            top: 0; 
+            left: 0; top: 0; 
             padding-top: 90px; 
             z-index: 900;
             overflow-y: auto;
@@ -112,24 +126,18 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
         }
 
         .feed-container {
-            margin-left: 65px; /* Deja el hueco exacto del sidebar */
+            margin-left: 65px; 
             position: relative;
             z-index: 2;
-            width: auto; /* Ocupa todo el espacio restante de la pantalla */
-            margin-top: 40px; 
+            width: auto; 
+            margin-top: 35px;
             padding: 0 20px;
-            
-            /* Magia para centrar el contenido en este espacio: */
             display: flex;
             flex-direction: column;
             align-items: center; 
         }
 
-        /* Evitamos que las tarjetas y títulos se estiren demasiado */
-        .feed-container > * {
-            width: 100%;
-            max-width: 700px;
-        }
+        .feed-container > * { width: 100%; max-width: 700px; }
 
         .vehicle-card { 
             margin-bottom: 40px; 
@@ -171,101 +179,49 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
         .btn-azul { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; }
         .btn-gris { background: rgba(255, 255, 255, 0.1); color: #cbd5e1; }
 
-/* --- HEADER: Por defecto para PC (Siempre visible) --- */
-.nav-header {
-    position: fixed; /* Cambiado de sticky a fixed para asegurar PC */
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    background: rgba(17, 24, 39, 0.85); 
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 12px 0;
-}
+        #scrollToTop { display: none ; }
 
-/* --- BOTÓN SUBIR: Oculto por defecto (PC) --- */
-#scrollToTop {
-    display: none ; /* No se verá en PC */
-}
-
-/* === AJUSTES EXCLUSIVOS PARA MÓVIL (Menos de 768px) === */
-@media (max-width: 768px) {
-    
-    .nav-header {
-        position: relative !important; 
-    }
-
-    #scrollToTop#scrollToTop {
-        display: none; 
-        position: fixed !important;
-        bottom: 25px !important;
-        right: 25px !important;
-        width: 55px !important;
-        height: 55px !important;
-        background-image: url('assets/img/flecha.jpg') !important;
-        background-size: cover !important;
-        background-position: center !important;
-        border: none !important;
-        border-radius: 45% ;
-        z-index: 99999 ;
-        
-        /* EFECTO FANTASMA POR DEFECTO */
-        opacity: 0.5 ; 
-        filter: brightness(1);
-        transition: all 0.2s ease-in-out ;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    /* EFECTO BRILLO AL TOCAR */
-    #scrollToTop#scrollToTop:active {
-        opacity: 0.5t; 
-        filter: brightness(1.8) drop-shadow(0 0 15px #3b82f6) !important; 
-        transform: scale(1.2) !important;
-    }
-}
-
-        /* === CORRECCIONES PARA MÓVIL === */
         @media (max-width: 768px) {
+            .nav-header { position: relative !important; }
+            #scrollToTop#scrollToTop {
+                display: none; 
+                position: fixed !important;
+                bottom: 25px !important;
+                right: 25px !important;
+                width: 55px !important;
+                height: 55px !important;
+                background-image: url('assets/img/flecha.jpg') !important;
+                background-size: cover !important;
+                background-position: center !important;
+                border: none !important;
+                border-radius: 45% ;
+                z-index: 99999 ;
+                opacity: 0.5 ; 
+                transition: all 0.2s ease-in-out ;
+                -webkit-tap-highlight-color: transparent;
+            }
+            #scrollToTop#scrollToTop:active {
+                opacity: 1; 
+                filter: brightness(1.8) drop-shadow(0 0 15px #3b82f6) !important; 
+                transform: scale(1.2) !important;
+            }
             .sidebar-left {
                 position: relative !important; 
                 width: 100% !important;
                 height: auto !important;
-                padding-top: 0px ; 
-                padding-bottom: 20px !important;
+                padding-top: 20px ; 
                 border-right: none;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
-            
             .feed-container { 
                 margin-left: 0 !important; 
                 width: 100% !important; 
                 padding: 15px !important; 
                 margin-top: 20px !important; 
             }
-
             .range-container { grid-template-columns: 1fr; }
-
-            .img-wrapper {
-                height: 220px; /* Las imágenes no se verán gigantes en móvil */
-            }
-            
-            .vehicle-card {
-                padding: 15px;
-            }
+            .img-wrapper { height: 220px; }
         }
-        /* Dentro de la etiqueta <style> de index.php */
-.feed-container {
-    margin-top: 100px; /* Espacio para que el header fijo no tape el título en PC */
-    /* ... resto de tu código ... */
-}
-
-@media (max-width: 768px) {
-    .feed-container {
-        margin-top: 20px !important; /* En móvil, como el header no es fijo, no hace falta tanto margen */
-    }
-}
     </style>
 </head>
 <body>
@@ -334,7 +290,7 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
 
     <div class="feed-container">
         <h2 style="border-left: 5px solid #3b82f6; padding-left: 15px; margin-bottom: 25px; text-shadow: 2px 2px 5px rgba(0,0,0,0.7); font-size: 1.6rem; color: #fff; margin-top: 0;">
-            Muro de la Comunidad
+            Feed de Seguidos
         </h2>
 
         <?php if(count($coches) > 0): ?>
@@ -352,8 +308,8 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
                         <div>
                             <span style="color: #9ca3af; font-size: 0.8rem;">Publicado por</span>
                             <a href="profile.php?id=<?= $c['user_id']; ?>" style="text-decoration: none;">
-    <strong style="color: #3b82f6; display: block; font-size: 1rem;">@<?= htmlspecialchars($c['username']); ?></strong>
-</a>
+                                <strong style="color: #3b82f6; display: block; font-size: 1rem;">@<?= htmlspecialchars($c['username']); ?></strong>
+                            </a>
                         </div>
                         <span style="color: #6b7280; font-size: 0.9rem; font-weight: bold;"><?= htmlspecialchars($c['year']); ?></span>
                     </div>
@@ -367,15 +323,15 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
                             <img src="<?= htmlspecialchars($ruta_final); ?>" alt="Vehículo">
                         <?php else: ?>
                             <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2);">
-                                <p style="color: #64748b; font-size: 0.9rem;">Imagen no disponible</p>
+                                <p style="color: #64748b; font-size: 0.9rem;">Sin imagen</p>
                             </div>
                         <?php endif; ?>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px; margin-bottom: 15px;">
-                        <div class="stats-badge" style="color:#fff; margin-bottom: 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div class="stats-badge" style="color:#fff;">
                              <span style="color: #fbbf24; font-weight: bold;"><?= $c['nota_media'] ? round($c['nota_media'], 1) : '---'; ?></span> 
-                            <span style="margin: 0 5px; opacity: 0.3;">|</span>
+                             <span style="margin: 0 5px; opacity: 0.3;">|</span>
                              <?= $c['total_comentarios']; ?> opiniones
                         </div>
                     </div>
@@ -388,31 +344,23 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <p style="color: #9ca3af; text-align: center; padding: 50px;">No hay coches con esos filtros.</p>
+            <div style="text-align: center; padding: 60px; background: rgba(31, 41, 55, 0.5); border-radius: 20px;">
+                <p style="color: #94a3b8; font-size: 1.1rem;">No hay coches aquí. Prueba a seguir a más usuarios o ajusta los filtros.</p>
+                <a href="index.php" style="color: #3b82f6; text-decoration: none; font-weight: bold; margin-top: 10px; display: inline-block;">Ver feed global</a>
+            </div>
         <?php endif; ?>
     </div>
 
     <button type="button" id="scrollToTop" title="Ir arriba"></button>
 
     <script>
-      const scrollBtn = document.getElementById("scrollToTop");
-    
-    window.onscroll = function() {
-        const isMobile = window.innerWidth <= 768;
-        const dist = document.body.scrollTop > 300 || document.documentElement.scrollTop > 300;
-
-        // Solo manejamos si existe o no en el DOM, el estilo lo pone el CSS
-        if (isMobile && dist) {
-            scrollBtn.style.display = "block";
-        } else {
-            scrollBtn.style.display = "none";
-        }
-    };
-
-    scrollBtn.onclick = function() {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
+        const scrollBtn = document.getElementById("scrollToTop");
+        window.onscroll = function() {
+            const isMobile = window.innerWidth <= 768;
+            const dist = document.body.scrollTop > 300 || document.documentElement.scrollTop > 300;
+            if (isMobile && dist) { scrollBtn.style.display = "block"; } else { scrollBtn.style.display = "none"; }
+        };
+        scrollBtn.onclick = function() { window.scrollTo({ top: 0, behavior: "smooth" }); };
     </script>
-   
 </body>
 </html>

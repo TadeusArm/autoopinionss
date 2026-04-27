@@ -11,7 +11,7 @@ $perfil_id = $_GET['id'];
 $mi_id = $_SESSION['user_id'];
 
 // 1. Obtener datos del dueño del perfil
-$stmt = $pdo->prepare("SELECT username, bio, location, instagram_user, profile_pic FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT id, username, bio, location, instagram_user, profile_pic FROM users WHERE id = ?");
 $stmt->execute([$perfil_id]);
 $usuario = $stmt->fetch();
 
@@ -20,7 +20,25 @@ if (!$usuario) {
     exit; 
 }
 
-// 2. Obtener los coches publicados por este usuario
+// Contar Seguidores
+$stmt_followers = $pdo->prepare("SELECT COUNT(*) FROM follows WHERE followed_id = ?");
+$stmt_followers->execute([$perfil_id]);
+$total_seguidores = $stmt_followers->fetchColumn();
+
+// Contar Seguidos
+$stmt_following = $pdo->prepare("SELECT COUNT(*) FROM follows WHERE follower_id = ?");
+$stmt_following->execute([$perfil_id]);
+$total_seguidos = $stmt_following->fetchColumn();
+
+// Verificar si YO sigo a este usuario
+$lo_sigo = false;
+if ($mi_id != $perfil_id) {
+    $stmt_check = $pdo->prepare("SELECT 1 FROM follows WHERE follower_id = ? AND followed_id = ?");
+    $stmt_check->execute([$mi_id, $perfil_id]);
+    $lo_sigo = (bool)$stmt_check->fetch();
+}
+
+// 2. Obtener los coches publicados
 $stmt_coches = $pdo->prepare("
     SELECT v.*, 
     (SELECT COUNT(*) FROM comments WHERE vehicle_id = v.id) as total_comentarios,
@@ -62,10 +80,10 @@ $coches_usuario = $stmt_coches->fetchAll();
             -webkit-backdrop-filter: blur(15px);
             padding: 40px;
             border-radius: 24px;
-            border: 0px solid rgba(255, 255, 255, 0.1);
             text-align: center;
             margin-bottom: 40px;
             position: relative;
+            border: 0px; /* Borde a 0 */
         }
 
         .user-avatar-big {
@@ -77,11 +95,9 @@ $coches_usuario = $stmt_coches->fetchAll();
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            font-weight: bold;
-            color: white;
             margin: 0 auto 20px;
             font-size: 3rem;
-            border: 0px solid rgba(59, 130, 246, 0.3);
+            border: 0px; /* Borde a 0 */
         }
 
         .user-avatar-big img {
@@ -97,34 +113,45 @@ $coches_usuario = $stmt_coches->fetchAll();
             letter-spacing: -1px;
         }
 
-        .location-text {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            margin-top: 5px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .bio-text {
-            color: #d1d5db;
-            line-height: 1.7;
-            margin: 20px auto;
-            max-width: 600px;
-            font-size: 1.05rem;
-        }
-
-        .social-link {
+        .btn-follow {
             display: inline-block;
-            background: rgba(225, 48, 108, 0.15);
-            color: #fb7185;
-            padding: 8px 20px;
+            margin-top: 15px;
+            padding: 10px 25px; /* Ajustado padding lateral para mejor forma */
             border-radius: 50px;
             text-decoration: none;
             font-weight: bold;
-            font-size: 0.85rem;
-            border: 0px solid rgba(225, 48, 108, 0.2);
             transition: 0.3s;
+            cursor: pointer;
+            border: 0px; /* Borde a 0 */
+            font-size: 0.9rem;
         }
+        .follow-active { background: #3b82f6; color: white; }
+        .follow-active:hover { background: #2563eb; }
+        .unfollow-active { background: rgba(255,255,255,0.1); color: white; }
+        .unfollow-active:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        /* AJUSTE DE BIO SOLICITADO */
+        .bio-text {
+            margin-top: 25px; /* Baja la biografía respecto al botón */
+            color: #94a3b8;
+            font-size: 1rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-item { text-align: center; }
+        .stat-num { display: block; font-size: 1.3rem; font-weight: bold; color: white; }
+        .stat-label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
 
         .grid-publicaciones {
             display: grid;
@@ -137,16 +164,13 @@ $coches_usuario = $stmt_coches->fetchAll();
             backdrop-filter: blur(10px);
             border-radius: 18px;
             overflow: hidden;
-            border: 0px solid rgba(255, 255, 255, 0.05);
             transition: 0.3s;
             text-decoration: none;
             color: white;
+            border: 0px; /* Borde a 0 */
         }
 
-        .mini-card-coche:hover {
-            transform: translateY(-5px);
-            border-color: rgba(59, 130, 246, 0.5);
-        }
+        .mini-card-coche:hover { transform: translateY(-5px); }
 
         .btn-editar-perfil {
             position: absolute;
@@ -158,20 +182,6 @@ $coches_usuario = $stmt_coches->fetchAll();
             border-radius: 8px;
             text-decoration: none;
             font-size: 0.8rem;
-            border: 0px solid rgba(255,255,255,0.1);
-        }
-
-        .mini-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-
-        @media (max-width: 768px) {
-            .perfil-wrapper { margin-top: 30px; }
-            .card-perfil-header { padding: 25px; border-radius: 0; margin-left: -20px; margin-right: -20px; }
         }
     </style>
 </head>
@@ -179,7 +189,6 @@ $coches_usuario = $stmt_coches->fetchAll();
     <?php include 'includes/header.php'; ?>
 
     <div class="perfil-wrapper">
-        
         <div class="card-perfil-header">
             <?php if($perfil_id == $mi_id): ?>
                 <a href="edit_profile.php" class="btn-editar-perfil">Configuración</a>
@@ -187,79 +196,81 @@ $coches_usuario = $stmt_coches->fetchAll();
 
             <div class="user-avatar-big">
                 <?php 
-                    // Ajuste: Usao la ruta almacenada directamente (assets/img/avatars/...)
-                    $foto_user = $usuario['profile_pic'] ?? '';
-
-                    if(!empty($foto_user) && file_exists($foto_user)): ?>
-                        <img src="<?php echo htmlspecialchars($foto_user); ?>" alt="Avatar">
-                    <?php else: ?>
-                        <?php echo strtoupper(substr($usuario['username'] ?? 'U', 0, 1)); ?>
-                    <?php endif; ?>
+                $foto_user = $usuario['profile_pic'] ?? '';
+                if(!empty($foto_user) && file_exists($foto_user)): ?>
+                    <img src="<?php echo htmlspecialchars($foto_user); ?>" alt="Avatar">
+                <?php else: ?>
+                    <?php echo strtoupper(substr($usuario['username'] ?? 'U', 0, 1)); ?>
+                <?php endif; ?>
             </div>
 
             <h1 class="username-title">@<?php echo htmlspecialchars($usuario['username']); ?></h1>
-            
-            <?php if(!empty($usuario['location'])): ?>
-                <div class="location-text">
-                    Ubicación: <?php echo htmlspecialchars($usuario['location']); ?>
-                </div>
-            <?php endif; ?>
 
+            <?php if($mi_id != $perfil_id): ?>
+                <form action="acciones/follow.php" method="POST" style="display:inline;">
+                    <input type="hidden" name="followed_id" value="<?php echo $perfil_id; ?>">
+                    <?php if($lo_sigo): ?>
+                        <button type="submit" name="accion" value="unfollow" class="btn-follow unfollow-active">Siguiendo</button>
+                    <?php else: ?>
+                        <button type="submit" name="accion" value="follow" class="btn-follow follow-active">Seguir</button>
+                    <?php endif; ?>
+                </form>
+            <?php endif; ?>
+            
             <div class="bio-text">
                 <?php echo $usuario['bio'] ? nl2br(htmlspecialchars($usuario['bio'])) : "Sin biografía definida."; ?>
             </div>
 
-            <?php if(!empty($usuario['instagram_user'])): ?>
-                <a href="https://instagram.com/<?php echo htmlspecialchars($usuario['instagram_user']); ?>" target="_blank" class="social-link">
-                    Instagram
-                </a>
-            <?php endif; ?>
-
-            <div style="margin-top: 30px; display: flex; justify-content: center; gap: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                <div>
-                    <span style="display: block; font-size: 1.2rem; font-weight: bold; color: #3b82f6;"><?php echo count($coches_usuario); ?></span>
-                    <span style="font-size: 0.7rem; color: #64748b; text-transform: uppercase;">Publicaciones</span>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-num"><?php echo count($coches_usuario); ?></span>
+                    <span class="stat-label">Coches</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num"><?php echo $total_seguidores; ?></span>
+                    <span class="stat-label">Seguidores</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-num"><?php echo $total_seguidos; ?></span>
+                    <span class="stat-label">Siguiendo</span>
                 </div>
             </div>
         </div>
 
-        <h3 style="margin-bottom: 25px; font-size: 1.2rem; font-weight: 700; color: white; padding-left: 0px; text-transform: none; letter-spacing: -0.5px;">
-    Garaje de <?php echo htmlspecialchars($usuario['username']); ?>
-</h3>
+        <h3 style="margin-bottom: 25px; font-size: 1.2rem; font-weight: 700; color: white;">
+            Garaje de <?php echo htmlspecialchars($usuario['username']); ?>
+        </h3>
 
-<div class="grid-publicaciones">
-    <?php if(count($coches_usuario) > 0): ?>
-        <?php foreach($coches_usuario as $v): ?>
-            <?php 
-                $img = $v['image'];
-                $ruta_coche = "assets/img/vehicles/" . $img;
-            ?>
-            <a href="comments.php?vehicle_id=<?php echo $v['id']; ?>" class="mini-card-coche">
-                <div style="width: 100%; height: 180px; background: #111;">
-                    <?php if(!empty($img) && file_exists($ruta_coche)): ?>
-                        <img src="<?php echo htmlspecialchars($ruta_coche); ?>" 
-                             style="width: 100%; height: 100%; object-fit: cover;">
-                    <?php else: ?>
-                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:0.8rem; background: rgba(0,0,0,0.2);">
-                            Sin foto
+        <div class="grid-publicaciones">
+            <?php if(count($coches_usuario) > 0): ?>
+                <?php foreach($coches_usuario as $v): ?>
+                    <?php 
+                        $img = $v['image'];
+                        $ruta_coche = "assets/img/vehicles/" . $img;
+                    ?>
+                    <a href="comments.php?vehicle_id=<?php echo $v['id']; ?>" class="mini-card-coche">
+                        <div style="width: 100%; height: 180px; background: #111;">
+                            <?php if(!empty($img) && file_exists($ruta_coche)): ?>
+                                <img src="<?php echo htmlspecialchars($ruta_coche); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                            <?php else: ?>
+                                <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#64748b; background: rgba(0,0,0,0.2);">Sin foto</div>
+                            <?php endif; ?>
                         </div>
-                    <?php endif; ?>
+                        <div style="padding: 15px;">
+                            <h4 style="margin:0; font-size: 1.1rem;"><?php echo htmlspecialchars($v['brand'] . " " . $v['model']); ?></h4>
+                            <div style="margin-top: 8px; font-size: 0.85rem; color: #94a3b8; display: flex; justify-content: space-between;">
+                                <span>Nota: <?php echo $v['nota_media'] ? round($v['nota_media'], 1) : '--'; ?></span>
+                                <span><?php echo $v['total_comentarios']; ?> opiniones</span>
+                            </div>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: rgba(255,255,255,0.05); border-radius: 15px; color: #94a3b8;">
+                    Este usuario aún no ha subido ningún coche.
                 </div>
-                <div style="padding: 15px;">
-                    <h4 style="margin:0; font-size: 1.1rem;"><?php echo htmlspecialchars($v['brand'] . " " . $v['model']); ?></h4>
-                    <div class="mini-stats" style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.8rem; color: #94a3b8;">
-                        <span>Nota: <?php echo $v['nota_media'] ? round($v['nota_media'], 1) : '--'; ?></span>
-                        <span><?php echo $v['total_comentarios']; ?> opiniones</span>
-                    </div>
-                </div>
-            </a>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: rgba(255,255,255,0.05); border-radius: 15px; color: #94a3b8;">
-            Este usuario aún no ha subido ningún coche a su garaje.
+            <?php endif; ?>
         </div>
-    <?php endif; ?>
-</div>
     </div>
 </body>
 </html>
