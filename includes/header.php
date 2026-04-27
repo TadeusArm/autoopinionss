@@ -34,8 +34,8 @@
 <style>
     /* Estilo extra para que el botón de admin brille un poco al pasar el ratón */
     .nav-admin-link:hover {
-        background: rgba(251, 191, 36, 0.2) !important;
-        box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
+        background: rgba(255, 243, 212, 0.2) !important;
+        box-shadow: 0 0 10px rgba(255, 246, 224, 0.2);
         color: white !important;
     }
 </style>

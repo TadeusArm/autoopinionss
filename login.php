@@ -4,26 +4,32 @@ include 'config/db.php';
 $message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
+    $login_input = $_POST['login_input']; 
     $password = $_POST['password'];
 
-    // 1. Añadimos 'role' a la consulta SQL
-    $stmt = $pdo->prepare("SELECT id, username, password, profile_pic, role FROM users WHERE email = ?");
-    $stmt->execute([$email]);
+    // 1. Modificamos la consulta: ahora también pedimos la columna 'verified'
+    $stmt = $pdo->prepare("SELECT id, username, password, profile_pic, role, verified FROM users WHERE email = ? OR username = ?");
+    $stmt->execute([$login_input, $login_input]);
     $user = $stmt->fetch();
 
     if($user && password_verify($password, $user['password'])){
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['profile_pic'] = $user['profile_pic']; 
         
-        // 2. Guardamos el rol en la sesión para que el panel de admin sepa quién eres
-        $_SESSION['role'] = $user['role']; 
-        
-        header("Location: index.php");
-        exit;
+        // 2. COMPROBACIÓN DE SEGURIDAD: ¿Está la cuenta activada?
+        if($user['verified'] == 0) {
+            $message = "Error: Debes confirmar tu cuenta por correo antes de entrar.";
+        } else {
+            // Si está verificado, iniciamos sesión normal
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['profile_pic'] = $user['profile_pic']; 
+            $_SESSION['role'] = $user['role']; 
+            
+            header("Location: index.php");
+            exit;
+        }
+
     } else {
-        $message = "Email o contraseña incorrectos";
+        $message = "Usuario o contraseña incorrectos";
     }
 }
 ?>
@@ -49,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <form method="POST">
             <div class="input-group">
-                <input type="email" name="email" placeholder="Correo electrónico" required>
+                <input type="text" name="login_input" placeholder="Usuario o correo electrónico" required>
             </div>
             <div class="input-group">
                 <input type="password" name="password" placeholder="Contraseña" required>
