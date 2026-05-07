@@ -41,7 +41,7 @@ $usuarios = $stmt->fetchAll();
 
         .admin-overlay {
             min-height: 100vh;
-            background: rgba(0, 0, 0, 0.6); /* Capa oscura para que resalte el cristal */
+            background: rgba(0, 0, 0, 0.6); 
             padding: 40px 20px;
         }
 
@@ -72,15 +72,12 @@ $usuarios = $stmt->fetchAll();
             letter-spacing: 2px;
         }
 
-        /* Estilo de la Tabla Moderna */
-        .table-container {
-            overflow-x: auto;
-        }
+        .table-container { overflow-x: auto; }
 
         table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 0 10px; /* Espacio entre filas */
+            border-spacing: 0 10px;
         }
 
         th {
@@ -97,35 +94,32 @@ $usuarios = $stmt->fetchAll();
             transition: all 0.3s ease;
         }
 
-        tr.user-row:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
+        tr.user-row:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); }
 
-        td {
-            padding: 15px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
+        td { padding: 15px; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
 
         td:first-child { border-left: 1px solid rgba(255,255,255,0.05); border-radius: 12px 0 0 12px; }
         td:last-child { border-right: 1px solid rgba(255,255,255,0.05); border-radius: 0 12px 12px 0; }
 
-        /* Avatares y Badges */
         .user-info { display: flex; align-items: center; gap: 12px; }
+        
+        /* Ajuste de la foto clickable */
         .mini-avatar {
-            width: 35px; height: 35px; border-radius: 50%;
+            width: 40px; height: 40px; border-radius: 50%;
             object-fit: cover; border: 2px solid rgba(255,255,255,0.2);
+            transition: transform 0.2s, border-color 0.2s;
         }
 
-        .badge {
-            padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold;
+        .mini-avatar:hover {
+            transform: scale(1.1);
+            border-color: #3b82f6;
+            cursor: pointer;
         }
+
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
         .badge-admin { background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid #fbbf24; }
         .badge-user { background: rgba(255, 255, 255, 0.1); color: #e5e7eb; }
 
-        /* Botón de borrar con estilo */
         .btn-delete {
             background: rgba(239, 68, 68, 0.1);
             color: #f87171;
@@ -137,11 +131,7 @@ $usuarios = $stmt->fetchAll();
             transition: 0.3s;
         }
 
-        .btn-delete:hover {
-            background: #ef4444;
-            color: white;
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
-        }
+        .btn-delete:hover { background: #ef4444; color: white; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
 
         .msg-alert {
             background: rgba(16, 185, 129, 0.2);
@@ -185,13 +175,16 @@ $usuarios = $stmt->fetchAll();
                     <tr class="user-row">
                         <td>
                             <div class="user-info">
-                                <?php if($u['profile_pic']): ?>
-                                    <img src="<?php echo $u['profile_pic']; ?>" class="mini-avatar">
-                                <?php else: ?>
-                                    <div class="mini-avatar" style="background:#4b5563; display:grid; place-items:center; font-size:12px;">
-                                        <?php echo strtoupper(substr($u['username'], 0, 1)); ?>
-                                    </div>
-                                <?php endif; ?>
+                                <!-- ENLACE AL PERFIL EN LA FOTO -->
+                                <a href="profile.php?id=<?php echo $u['id']; ?>" title="Ver perfil de <?php echo $u['username']; ?>">
+                                    <?php if($u['profile_pic']): ?>
+                                        <img src="<?php echo $u['profile_pic']; ?>" class="mini-avatar">
+                                    <?php else: ?>
+                                        <div class="mini-avatar" style="background:#4b5563; display:grid; place-items:center; font-size:12px;">
+                                            <?php echo strtoupper(substr($u['username'], 0, 1)); ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </a>
                                 <span><?php echo htmlspecialchars($u['username']); ?></span>
                             </div>
                         </td>
@@ -208,7 +201,7 @@ $usuarios = $stmt->fetchAll();
                                 <a href="admin.php?delete_user=<?php echo $u['id']; ?>" 
                                    class="btn-delete"
                                    onclick="return confirm('¿Baneamos a este usuario? Se eliminarán todos sus coches y comentarios.')">
-                                    Eliminar
+                                    Bannear
                                 </a>
                             <?php else: ?>
                                 <span style="font-size: 0.8rem; color: #6b7280; font-style: italic;">Cuenta actual</span>
@@ -218,6 +211,27 @@ $usuarios = $stmt->fetchAll();
                     <?php endforeach; ?>
                 </tbody>
             </table>
+        </div>
+        <div style="margin-top: 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px;">
+            <a href="admin_dashboard.php" style="
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                background: rgba(59, 130, 246, 0.15);
+                color: #3b82f6;
+                padding: 12px 30px;
+                border-radius: 12px;
+                text-decoration: none;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-size: 0.8rem;
+                border: 1px solid rgba(59, 130, 246, 0.3);
+                transition: 0.3s;
+            " onmouseover="this.style.background='#3b82f6'; this.style.color='white';" 
+               onmouseout="this.style.background='rgba(59, 130, 246, 0.15)'; this.style.color='#3b82f6';">
+                <span style="font-size: 1.2rem;"></span> Ver Análisis del Sistema
+            </a>
         </div>
     </div>
 </div>

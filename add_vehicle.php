@@ -10,13 +10,13 @@ if(!isset($_SESSION['user_id'])){
 $mensaje = "";
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $brand = $_POST['brand'];
-    $model = $_POST['model'];
-    $year  = $_POST['year'];
-    $km    = $_POST['km']; 
-    $user_id = $_SESSION['user_id'];
+    $brand       = $_POST['brand'];
+    $model       = $_POST['model'];
+    $year        = $_POST['year'];
+    $km          = $_POST['km']; 
+    $description = $_POST['description']; // Nueva variable para la descripción
+    $user_id     = $_SESSION['user_id'];
 
-    // Gestión de imagen
     $image_name = "";
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
@@ -24,11 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         move_uploaded_file($_FILES['image']['tmp_name'], "assets/img/vehicles/" . $image_name);
     }
 
-    // INSERT ACTUALIZADO
-    $sql = "INSERT INTO vehicles (brand, model, year, km, image, user_id) VALUES (?, ?, ?, ?, ?, ?)";
+    // INSERT con el campo description incluido
+    $sql = "INSERT INTO vehicles (brand, model, year, km, description, image, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmt = $pdo->prepare($sql);
     
-    if ($stmt->execute([$brand, $model, $year, $km, $image_name, $user_id])) {
+    if ($stmt->execute([$brand, $model, $year, $km, $description, $image_name, $user_id])) {
         header("Location: index.php");
         exit;
     } else {
@@ -41,46 +41,172 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Subir Coche - AutoOpinions</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicar Coche - AutoOpinions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: url('assets/img/PublicarVehiculo.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .overlay {
+            background: rgba(10, 15, 25, 0.85);
+            min-height: 100vh;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .glass-card {
+            width: 100%;
+            max-width: 600px; /* Un poco más ancho para la descripción */
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        h1 { font-weight: 200; font-size: 1.5rem; letter-spacing: 4px; text-transform: uppercase; margin: 0; }
+        h1 b { color: #3b82f6; font-weight: 900; }
+
+        .input-group { margin-bottom: 20px; }
+
+        .label-text {
+            color: #64748b;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: background 0.3s ease;
+        }
+
+        textarea {
+            resize: none;
+            height: 100px;
+        }
+
+        input:focus, textarea:focus {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .cancel-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #475569;
+            text-decoration: none;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 480px) {
+            .form-row { grid-template-columns: 1fr; gap: 0; }
+        }
+    </style>
 </head>
 <body>
-    <div class="overlay"></div>
-    <?php include 'includes/header.php'; ?>
 
-    <div class="card" style="max-width: 500px; margin: 50px auto;">
-        <h2 style="text-align: center; margin-bottom: 25px;">Subir nuevo vehículo</h2>
-        
+<div class="overlay">
+    <div class="glass-card">
+        <div class="header-section">
+            <h1>Publicar <b>Vehículo</b></h1>
+        </div>
+
         <form method="POST" enctype="multipart/form-data">
-            <div class="input-group" style="margin-bottom: 15px;">
-                <label style="color: #94a3b8; font-size: 0.8rem;">Marca</label>
-                <input type="text" name="brand" placeholder="Ej: BMW" required>
-            </div>
-
-            <div class="input-group" style="margin-bottom: 15px;">
-                <label style="color: #94a3b8; font-size: 0.8rem;">Modelo</label>
-                <input type="text" name="model" placeholder="Ej: M3" required>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div class="form-row">
                 <div class="input-group">
-                    <label style="color: #94a3b8; font-size: 0.8rem;">Año</label>
+                    <span class="label-text">Marca</span>
+                    <input type="text" name="brand" placeholder="BMW" required>
+                </div>
+                <div class="input-group">
+                    <span class="label-text">Modelo</span>
+                    <input type="text" name="model" placeholder="Serie 3" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="input-group">
+                    <span class="label-text">Año</span>
                     <input type="number" name="year" placeholder="2024" required>
                 </div>
                 <div class="input-group">
-                    <label style="color: #94a3b8; font-size: 0.8rem;">Kilómetros</label>
-                    <input type="number" name="km" placeholder="Ej: 50000" required>
+                    <span class="label-text">Kilómetros</span>
+                    <input type="number" name="km" placeholder="0" required>
                 </div>
             </div>
 
-            <div class="input-group" style="margin-bottom: 25px;">
-                <label style="color: #94a3b8; font-size: 0.8rem;">Foto del coche</label>
+            <div class="input-group">
+                <span class="label-text">Descripción</span>
+                <textarea name="description" placeholder="Cuéntanos algo sobre esta joya..."></textarea>
+            </div>
+
+            <div class="input-group">
+                <span class="label-text">Imagen del vehículo</span>
                 <input type="file" name="image" accept="image/*" required>
             </div>
 
-            <button type="submit" class="btn-submit">Publicar coche</button>
-            <a href="index.php" style="display: block; text-align: center; margin-top: 15px; color: #64748b; text-decoration: none; font-size: 0.9rem;">Cancelar</a>
+            <button type="submit" class="btn-submit">Publicar ahora</button>
+            <a href="index.php" class="cancel-link">Volver atrás</a>
         </form>
     </div>
+</div>
+
 </body>
 </html>

@@ -7,18 +7,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $login_input = $_POST['login_input']; 
     $password = $_POST['password'];
 
-    // 1. Modificamos la consulta: ahora también pedimos la columna 'verified'
+    // 1. Mantenemos la columna 'verified' en la consulta para no romper el código después
     $stmt = $pdo->prepare("SELECT id, username, password, profile_pic, role, verified FROM users WHERE email = ? OR username = ?");
     $stmt->execute([$login_input, $login_input]);
     $user = $stmt->fetch();
 
     if($user && password_verify($password, $user['password'])){
         
-        // 2. COMPROBACIÓN DE SEGURIDAD: ¿Está la cuenta activada?
+        /* 
+           COMENTADO PARA DESARROLLO LOCAL
+           Descomentar estas líneas al subir al hosting para activar la verificación por correo.
+        
         if($user['verified'] == 0) {
             $message = "Error: Debes confirmar tu cuenta por correo antes de entrar.";
         } else {
-            // Si está verificado, iniciamos sesión normal
+        */
+            // Si el código está comentado, entra directamente
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['profile_pic'] = $user['profile_pic']; 
@@ -26,7 +30,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             header("Location: index.php");
             exit;
-        }
+        /* 
+        } 
+        */
 
     } else {
         $message = "Usuario o contraseña incorrectos";

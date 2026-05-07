@@ -1,7 +1,9 @@
 <header class="nav-header">
     <div class="header-container">
         <div class="nav-left">
-            <a href="index.php" class="nav-logo">AUTO OPINIONS</a>
+            <a href="index.php" class="nav-logo">
+                <img src="assets/img/logo.png" alt="Auto Opinions" class="header-logo-img">
+            </a>
         </div>
 
         <nav class="nav-links">
@@ -35,7 +37,23 @@
 </header>
 
 <style>
-    
+    /* Estilos para el nuevo logo */
+    .header-logo-img {
+        height: 50px; /* Ajusta la altura según veas que queda mejor */
+        width: auto;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+
+    .header-logo-img:hover {
+        transform: scale(1.05);
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+    }
+
     .nav-links a {
         transition: 0.3s;
         text-decoration: none;
@@ -51,5 +69,15 @@
         background: rgba(255, 243, 212, 0.2) !important;
         box-shadow: 0 0 10px rgba(255, 246, 224, 0.2);
         color: white !important;
+    }
+
+    /* Ajuste para que el header no se vea apretado */
+    .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
     }
 </style>

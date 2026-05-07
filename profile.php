@@ -2,23 +2,28 @@
 session_start();
 include 'config/db.php';
 
-if(!isset($_SESSION['user_id']) || !isset($_GET['id'])){
+// 1. Usamos el nombre que ya tenías: $perfil_id
+$perfil_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+// Si no hay ID, al index
+if ($perfil_id <= 0) {
     header("Location: index.php");
     exit;
 }
 
-$perfil_id = $_GET['id'];
-$mi_id = $_SESSION['user_id'];
-
-// 1. Obtener datos del dueño del perfil
-$stmt = $pdo->prepare("SELECT id, username, bio, location, instagram_user, profile_pic FROM users WHERE id = ?");
+// 2. Buscamos al usuario y lo guardamos en $usuario (como tenías antes)
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$perfil_id]);
 $usuario = $stmt->fetch();
 
-if (!$usuario) { 
-    echo "Usuario no encontrado."; 
-    exit; 
+// 3. Si no existe, al baneo de GTA
+if (!$usuario) {
+    header("Location: user_banned.php");
+    exit;
 }
+
+// 4. Definimos $mi_id para las comprobaciones de "Seguir" o "Editar"
+$mi_id = $_SESSION['user_id'] ?? 0;
 
 // Contar Seguidores
 $stmt_followers = $pdo->prepare("SELECT COUNT(*) FROM follows WHERE followed_id = ?");

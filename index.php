@@ -381,7 +381,7 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
                     </div>
 
                     <?php if($ya_opino): ?>
-                        <a href="comments.php?vehicle_id=<?= $c['id']; ?>#leer" class="btn-gris">Ver opiniones (Participado)</a>
+                        <a href="comments.php?vehicle_id=<?= $c['id']; ?>#leer" class="btn-gris">Ver opiniones</a>
                     <?php else: ?>
                         <a href="comments.php?vehicle_id=<?= $c['id']; ?>" class="btn-azul">Opinar y ver detalles</a>
                     <?php endif; ?>
