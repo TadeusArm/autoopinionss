@@ -36,7 +36,7 @@ function enviarNotificacionEmail($emailDestino, $usernameDestino, $tipo, $extra 
         
         if ($tipo === 'verify') {
             // Email de Registro
-            $enlace = "https://autoopinions.es/verificar.php?token=" . $extra;
+            $enlace = "https://autoopinions.es/verify.php?token=" . $extra;
             $mail->Subject = 'Confirma tu cuenta en AutoOpinions';
             $mail->Body    = "
                 <div style='font-family: Arial, sans-serif; color: #333;'>

@@ -4,36 +4,25 @@ include 'config/db.php';
 $message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $login_input = $_POST['login_input']; 
+    $login_input = $_POST['login_input'];
     $password = $_POST['password'];
 
-    // 1. Mantenemos la columna 'verified' en la consulta para no romper el código después
     $stmt = $pdo->prepare("SELECT id, username, password, profile_pic, role, verified FROM users WHERE email = ? OR username = ?");
     $stmt->execute([$login_input, $login_input]);
     $user = $stmt->fetch();
 
     if($user && password_verify($password, $user['password'])){
-        
-        /* 
-           COMENTADO PARA DESARROLLO LOCAL
-           Descomentar estas líneas al subir al hosting para activar la verificación por correo.
-        
         if($user['verified'] == 0) {
             $message = "Error: Debes confirmar tu cuenta por correo antes de entrar.";
         } else {
-        */
-            // Si el código está comentado, entra directamente
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
-            $_SESSION['profile_pic'] = $user['profile_pic']; 
-            $_SESSION['role'] = $user['role']; 
-            
+            $_SESSION['profile_pic'] = $user['profile_pic'];
+            $_SESSION['role'] = $user['role'];
+           
             header("Location: index.php");
             exit;
-        /* 
-        } 
-        */
-
+        }
     } else {
         $message = "Usuario o contraseña incorrectos";
     }
@@ -45,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - AutoOpinions</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" type="image/png" href="assets/img/favicon.png"> <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
     <div class="overlay"></div>
@@ -68,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <button type="submit" class="btn-submit">Entrar</button>
         </form>
-        
+       
         <p class="text-footer">
             ¿Eres nuevo? <a href="register.php">Crea una cuenta</a>
         </p>
