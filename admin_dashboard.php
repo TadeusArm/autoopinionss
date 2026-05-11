@@ -6,17 +6,17 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: index.php"); exit;
 }
 
-// --- ESTADÍSTICAS RÁPIDAS (7 DÍAS) ---
+//  ESTADÍSTICAS RÁPIDAS (7 DÍAS)
 $nuevosUsuarios = $pdo->query("SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn();
 $nuevasPublis = $pdo->query("SELECT COUNT(*) FROM vehicles WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn();
 $totalComments = $pdo->query("SELECT COUNT(*) FROM comments WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn();
 
-// --- PERFILES DESTACADOS ---
+//  PERFILES DESTACADOS 
 $primerUser = $pdo->query("SELECT username FROM users ORDER BY id ASC LIMIT 1")->fetchColumn();
 $ultimoUser = $pdo->query("SELECT username FROM users ORDER BY id DESC LIMIT 1")->fetchColumn();
 $userActivo = $pdo->query("SELECT u.username FROM users u JOIN vehicles v ON u.id = v.user_id GROUP BY u.id ORDER BY COUNT(v.id) DESC LIMIT 1")->fetchColumn();
 
-// --- LÓGICA MENSUAL PARA EL GRÁFICO GRANDE ---
+//  LÓGICA MENSUAL PARA EL GRÁFICO GRANDE 
 $mesActual = date('m');
 $anioActual = date('Y');
 $nombreMes = date('F'); 
@@ -103,12 +103,12 @@ $valoresDias = array_values($datosMensuales);
         /* Rejilla de cartas de números */
         .grid-main-stats {
             display: grid;
-            grid-template-columns: 1fr; /* Móvil: 1 columna */
+            grid-template-columns: 1fr; 
             gap: 15px;
         }
 
         @media (min-width: 480px) {
-            .grid-main-stats { grid-template-columns: repeat(3, 1fr); } /* Tablets/PC: 3 columnas */
+            .grid-main-stats { grid-template-columns: repeat(3, 1fr); } 
         }
 
         .stat-card {
@@ -225,7 +225,7 @@ $valoresDias = array_values($datosMensuales);
                 font-size: 0.75rem;
                 text-transform: uppercase;
                 letter-spacing: 2px;
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                border: none;
                 backdrop-filter: blur(10px);
                 transition: 0.3s;
             " onmouseover="this.style.borderColor='#3b82f6'; this.style.color='#3b82f6';" 

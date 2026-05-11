@@ -48,7 +48,7 @@ session_start();
             display: flex;
             align-items: center;
             gap: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: none;
         }
 
         .btn-volver:hover {

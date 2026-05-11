@@ -11,18 +11,18 @@ if ($perfil_id <= 0) {
     exit;
 }
 
-// 2. Buscamos al usuario y lo guardamos en $usuario (como tenías antes)
+// 2. Buscamos al usuario y lo guardamos en $usuario
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$perfil_id]);
 $usuario = $stmt->fetch();
 
-// 3. Si no existe, al baneo de GTA
+// 3. Si no existe
 if (!$usuario) {
     header("Location: user_banned.php");
     exit;
 }
 
-// 4. Definimos $mi_id para las comprobaciones de "Seguir" o "Editar"
+// 4. Definimos $mi_id para las comprobaciones
 $mi_id = $_SESSION['user_id'] ?? 0;
 
 // Contar Seguidores
@@ -43,7 +43,7 @@ if ($mi_id != $perfil_id) {
     $lo_sigo = (bool)$stmt_check->fetch();
 }
 
-// 2. Obtener los coches publicados
+// Obtener los coches publicados
 $stmt_coches = $pdo->prepare("
     SELECT v.*, 
     (SELECT COUNT(*) FROM comments WHERE vehicle_id = v.id) as total_comentarios,
@@ -65,10 +65,26 @@ $coches_usuario = $stmt_coches->fetchAll();
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
         body { 
-            background: url('assets/img/fondo-index.jpg') center/cover no-repeat fixed !important; 
+            background: url('assets/img/fondoperfiles.jpg') center/cover no-repeat fixed !important; 
             color: white; 
             margin: 0;
             padding: 0;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* CAPA DE GLASSMORPHISM SOBRE EL FONDO */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3); /* Oscurece un poco la foto */
+            backdrop-filter: blur(10px);    /* Aplica el desenfoque cristalino */
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1;                     /* Detrás del contenido, delante de la foto */
         }
 
         .perfil-wrapper {
@@ -76,19 +92,17 @@ $coches_usuario = $stmt_coches->fetchAll();
             margin: 110px auto 50px;
             padding: 0 20px;
             position: relative;
-            z-index: 2;
+            z-index: 2; /* Por encima del efecto blur */
         }
 
         .card-perfil-header {
-            background: rgba(17, 24, 39, 0.85);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(5px);
             padding: 40px;
             border-radius: 24px;
             text-align: center;
             margin-bottom: 40px;
-            position: relative;
-            border: 0px; /* Borde a 0 */
+            border: none;
         }
 
         .user-avatar-big {
@@ -102,7 +116,6 @@ $coches_usuario = $stmt_coches->fetchAll();
             overflow: hidden;
             margin: 0 auto 20px;
             font-size: 3rem;
-            border: 0px; /* Borde a 0 */
         }
 
         .user-avatar-big img {
@@ -115,31 +128,24 @@ $coches_usuario = $stmt_coches->fetchAll();
             font-size: 2.2rem;
             color: #3b82f6;
             margin: 0;
-            letter-spacing: -1px;
         }
 
         .btn-follow {
             display: inline-block;
             margin-top: 15px;
-            padding: 10px 25px; /* Ajustado padding lateral para mejor forma */
+            padding: 10px 25px; 
             border-radius: 50px;
             text-decoration: none;
             font-weight: bold;
-            transition: 0.3s;
+            border: none;
             cursor: pointer;
-            border: 0px; /* Borde a 0 */
-            font-size: 0.9rem;
         }
         .follow-active { background: #3b82f6; color: white; }
-        .follow-active:hover { background: #2563eb; }
         .unfollow-active { background: rgba(255,255,255,0.1); color: white; }
-        .unfollow-active:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
 
-        /* AJUSTE DE BIO SOLICITADO */
         .bio-text {
-            margin-top: 25px; /* Baja la biografía respecto al botón */
-            color: #94a3b8;
-            font-size: 1rem;
+            margin-top: 25px; 
+            color: #cbd5e1;
             max-width: 500px;
             margin-left: auto;
             margin-right: auto;
@@ -154,9 +160,8 @@ $coches_usuario = $stmt_coches->fetchAll();
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
-        .stat-item { text-align: center; }
-        .stat-num { display: block; font-size: 1.3rem; font-weight: bold; color: white; }
-        .stat-label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-num { display: block; font-size: 1.3rem; font-weight: bold; }
+        .stat-label { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; }
 
         .grid-publicaciones {
             display: grid;
@@ -165,17 +170,16 @@ $coches_usuario = $stmt_coches->fetchAll();
         }
 
         .mini-card-coche {
-            background: rgba(31, 41, 55, 0.7);
-            backdrop-filter: blur(10px);
+            background: rgba(31, 41, 55, 0.8);
             border-radius: 18px;
             overflow: hidden;
-            transition: 0.3s;
             text-decoration: none;
             color: white;
-            border: 0px; /* Borde a 0 */
+            transition: 0.3s;
+            border: none;
         }
 
-        .mini-card-coche:hover { transform: translateY(-5px); }
+        .mini-card-coche:hover { transform: translateY(-5px); background: rgba(31, 41, 55, 0.9); }
 
         .btn-editar-perfil {
             position: absolute;
@@ -242,7 +246,7 @@ $coches_usuario = $stmt_coches->fetchAll();
             </div>
         </div>
 
-        <h3 style="margin-bottom: 25px; font-size: 1.2rem; font-weight: 700; color: white;">
+        <h3 style="margin-bottom: 25px; font-size: 1.2rem; font-weight: 700;">
             Garaje de <?php echo htmlspecialchars($usuario['username']); ?>
         </h3>
 
@@ -258,7 +262,7 @@ $coches_usuario = $stmt_coches->fetchAll();
                             <?php if(!empty($img) && file_exists($ruta_coche)): ?>
                                 <img src="<?php echo htmlspecialchars($ruta_coche); ?>" style="width: 100%; height: 100%; object-fit: cover;">
                             <?php else: ?>
-                                <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#64748b; background: rgba(0,0,0,0.2);">Sin foto</div>
+                                <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#64748b;">Sin foto</div>
                             <?php endif; ?>
                         </div>
                         <div style="padding: 15px;">
@@ -271,7 +275,7 @@ $coches_usuario = $stmt_coches->fetchAll();
                     </a>
                 <?php endforeach; ?>
             <?php else: ?>
-                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: rgba(255,255,255,0.05); border-radius: 15px; color: #94a3b8;">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: rgba(255,255,255,0.05); border-radius: 15px;">
                     Este usuario aún no ha subido ningún coche.
                 </div>
             <?php endif; ?>

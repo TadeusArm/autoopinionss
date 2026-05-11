@@ -51,7 +51,7 @@ $usuarios = $stmt->fetchAll();
             background: rgba(255, 255, 255, 0.07);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: none;
             border-radius: 24px;
             padding: 40px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -226,7 +226,7 @@ $usuarios = $stmt->fetchAll();
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 font-size: 0.8rem;
-                border: 1px solid rgba(59, 130, 246, 0.3);
+                border: none;
                 transition: 0.3s;
             " onmouseover="this.style.background='#3b82f6'; this.style.color='white';" 
                onmouseout="this.style.background='rgba(59, 130, 246, 0.15)'; this.style.color='#3b82f6';">

@@ -92,7 +92,7 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
         .sidebar-left input, .sidebar-left select {
             width: 100%;
             background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: none;
             color: white;
             padding: 10px;
             border-radius: 8px;
@@ -112,10 +112,10 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
         }
 
         .feed-container {
-            margin-left: 65px; /* Deja el hueco exacto del sidebar */
+            margin-left: 65px; 
             position: relative;
             z-index: 2;
-            width: auto; /* Ocupa todo el espacio restante de la pantalla */
+            width: auto; 
             margin-top: 40px; 
             padding: 0 20px;
             
@@ -171,9 +171,9 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
         .btn-azul { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; }
         .btn-gris { background: rgba(255, 255, 255, 0.1); color: #cbd5e1; }
 
-/* --- HEADER: Por defecto para PC (Siempre visible) --- */
+
 .nav-header {
-    position: fixed; /* Cambiado de sticky a fixed para asegurar PC */
+    position: fixed; 
     top: 0;
     left: 0;
     width: 100%;
@@ -185,12 +185,12 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
     padding: 12px 0;
 }
 
-/* --- BOTÓN SUBIR: Oculto por defecto (PC) --- */
+
 #scrollToTop {
-    display: none ; /* No se verá en PC */
+    display: none ; 
 }
 
-/* === AJUSTES EXCLUSIVOS PARA MÓVIL (Menos de 768px) === */
+/* AJUSTES EXCLUSIVOS PARA MÓVIL (Menos de 768px) */
 @media (max-width: 768px) {
     
     .nav-header {
@@ -401,7 +401,6 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
         const isMobile = window.innerWidth <= 768;
         const dist = document.body.scrollTop > 300 || document.documentElement.scrollTop > 300;
 
-        // Solo manejamos si existe o no en el DOM, el estilo lo pone el CSS
         if (isMobile && dist) {
             scrollBtn.style.display = "block";
         } else {

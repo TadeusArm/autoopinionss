@@ -106,7 +106,7 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
         .sidebar-left input, .sidebar-left select {
             width: 100%;
             background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: none;
             color: white;
             padding: 10px;
             border-radius: 8px;
