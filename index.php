@@ -348,49 +348,52 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
                     $ruta_final = (strpos($img_db, 'assets/') === 0) ? $img_db : "assets/img/vehicles/" . $img_db;
                 ?>
                 <div class="vehicle-card">
-                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                        <div>
-                            <span style="color: #9ca3af; font-size: 0.8rem;">Publicado por</span>
-                            <a href="profile.php?id=<?= $c['user_id']; ?>" style="text-decoration: none;">
-    <strong style="color: #3b82f6; display: block; font-size: 1rem;">@<?= htmlspecialchars($c['username']); ?></strong>
-</a>
-                        </div>
-                        <span style="color: #6b7280; font-size: 0.9rem; font-weight: bold;"><?= htmlspecialchars($c['year']); ?></span>
-                    </div>
+    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <div>
+            <span style="color: #9ca3af; font-size: 0.8rem;">Publicado por</span>
+            <a href="profile.php?id=<?= $c['user_id']; ?>" style="text-decoration: none;">
+                <strong style="color: #3b82f6; display: block; font-size: 1rem;">@<?= htmlspecialchars($c['username']); ?></strong>
+            </a>
+        </div>
+        <span style="color: #6b7280; font-size: 0.9rem; font-weight: bold;"><?= htmlspecialchars($c['year']); ?></span>
+    </div>
 
-                    <h3 style="margin: 10px 0; font-size: 1.6rem; letter-spacing: -0.5px; color: #f8fafc;">
-                        <?= htmlspecialchars($c['brand'] . " " . $c['model']); ?>
-                    </h3>
-                    
-                    <div class="img-wrapper">
-                        <?php if(!empty($img_db)): ?>
-                            <img src="<?= htmlspecialchars($ruta_final); ?>" alt="Vehículo">
-                        <?php else: ?>
-                            <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2);">
-                                <p style="color: #64748b; font-size: 0.9rem;">Imagen no disponible</p>
-                            </div>
-                        <?php endif; ?>
-                    </div>
+    <h3 style="margin: 10px 0; font-size: 1.6rem; letter-spacing: -0.5px; color: #f8fafc;">
+        <?= htmlspecialchars($c['brand'] . " " . $c['model']); ?>
+    </h3>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px; margin-bottom: 15px;">
-                        <div class="stats-badge" style="color:#fff; margin-bottom: 0;">
-                             <span style="color: #fbbf24; font-weight: bold;"><?= $c['nota_media'] ? round($c['nota_media'], 1) : '---'; ?></span> 
-                            <span style="margin: 0 5px; opacity: 0.3;">|</span>
-                             <?= $c['total_comentarios']; ?> opiniones
-                        </div>
-                    </div>
-
-                    <?php if($ya_opino): ?>
-                        <a href="comments.php?vehicle_id=<?= $c['id']; ?>#leer" class="btn-gris">Ver opiniones</a>
-                    <?php else: ?>
-                        <a href="comments.php?vehicle_id=<?= $c['id']; ?>" class="btn-azul">Opinar y ver detalles</a>
-                    <?php endif; ?>
-                </div>
-            <?php endforeach; ?>
+    <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+        <?= htmlspecialchars($c['description'] ?? $c['descripcion'] ?? 'Sin descripción disponible.'); ?>
+    </p>
+    
+    <div class="img-wrapper">
+        <?php if(!empty($img_db)): ?>
+            <img src="<?= htmlspecialchars($ruta_final); ?>" alt="Vehículo">
         <?php else: ?>
-            <p style="color: #9ca3af; text-align: center; padding: 50px;">No hay coches con esos filtros.</p>
+            <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2);">
+                <p style="color: #64748b; font-size: 0.9rem;">Imagen no disponible</p>
+            </div>
         <?php endif; ?>
     </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; margin-bottom: 15px;">
+        <div class="stats-badge" style="color:#fff; margin-bottom: 0;">
+             <span style="color: #fbbf24; font-weight: bold;"><?= $c['nota_media'] ? round($c['nota_media'], 1) : '---'; ?></span> 
+            <span style="margin: 0 5px; opacity: 0.3;">|</span>
+             <?= $c['total_comentarios']; ?> opiniones
+        </div>
+    </div>
+
+    <?php if($ya_opino): ?>
+        <a href="comments.php?vehicle_id=<?= $c['id']; ?>#leer" class="btn-gris">Ver opiniones</a>
+    <?php else: ?>
+        <a href="comments.php?vehicle_id=<?= $c['id']; ?>" class="btn-azul">Opinar y ver detalles</a>
+    <?php endif; ?>
+</div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p style="color: #94a3b8; font-size: 1rem; margin-top: 50px;">No se encontraron vehículos que coincidan con los filtros.</p>
+        <?php endif; ?>
 
     <button type="button" id="scrollToTop" title="Ir arriba"></button>
 

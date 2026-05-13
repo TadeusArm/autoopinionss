@@ -227,7 +227,7 @@ $user = $stmt->fetch();
                 </button>
 
                 <div class="logout-section">
-                    <a href="logout.php" class="btn-logout">Cerrar sesión de forma segura</a>
+                    <a href="logout.php" class="btn-logout">Cerrar sesión</a>
                 </div>
             </form>
         </div>

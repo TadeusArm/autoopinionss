@@ -73,7 +73,6 @@ $coches_usuario = $stmt_coches->fetchAll();
             position: relative;
         }
 
-        /* CAPA DE GLASSMORPHISM SOBRE EL FONDO */
         body::before {
             content: "";
             position: fixed;
@@ -81,10 +80,10 @@ $coches_usuario = $stmt_coches->fetchAll();
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.3); /* Oscurece un poco la foto */
-            backdrop-filter: blur(10px);    /* Aplica el desenfoque cristalino */
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(20px);
-            z-index: 1;                     /* Detrás del contenido, delante de la foto */
+            z-index: 1;
         }
 
         .perfil-wrapper {
@@ -92,7 +91,7 @@ $coches_usuario = $stmt_coches->fetchAll();
             margin: 110px auto 50px;
             padding: 0 20px;
             position: relative;
-            z-index: 2; /* Por encima del efecto blur */
+            z-index: 2;
         }
 
         .card-perfil-header {
@@ -103,6 +102,7 @@ $coches_usuario = $stmt_coches->fetchAll();
             text-align: center;
             margin-bottom: 40px;
             border: none;
+            position: relative;
         }
 
         .user-avatar-big {
@@ -143,14 +143,6 @@ $coches_usuario = $stmt_coches->fetchAll();
         .follow-active { background: #3b82f6; color: white; }
         .unfollow-active { background: rgba(255,255,255,0.1); color: white; }
 
-        .bio-text {
-            margin-top: 25px; 
-            color: #cbd5e1;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
         .stats-bar {
             display: flex;
             justify-content: center;
@@ -176,6 +168,7 @@ $coches_usuario = $stmt_coches->fetchAll();
             text-decoration: none;
             color: white;
             transition: 0.3s;
+            display: block;
             border: none;
         }
 
@@ -192,6 +185,37 @@ $coches_usuario = $stmt_coches->fetchAll();
             text-decoration: none;
             font-size: 0.8rem;
         }
+
+        /* Estilos para el menú de opciones (Tres puntos) */
+        .menu-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 35px;
+            background: #1f2937;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            min-width: 130px;
+            z-index: 100;
+        }
+
+        .menu-dropdown a, .menu-dropdown button {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.85rem;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .menu-dropdown a:hover { background: rgba(59, 130, 246, 0.2); }
+        .menu-dropdown button:hover { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
     </style>
 </head>
 <body>
@@ -226,7 +250,7 @@ $coches_usuario = $stmt_coches->fetchAll();
                 </form>
             <?php endif; ?>
             
-            <div class="bio-text">
+            <div class="bio-text" style="margin-top: 20px; color: #cbd5e1;">
                 <?php echo $usuario['bio'] ? nl2br(htmlspecialchars($usuario['bio'])) : "Sin biografía definida."; ?>
             </div>
 
@@ -257,22 +281,57 @@ $coches_usuario = $stmt_coches->fetchAll();
                         $img = $v['image'];
                         $ruta_coche = "assets/img/vehicles/" . $img;
                     ?>
-                    <a href="comments.php?vehicle_id=<?php echo $v['id']; ?>" class="mini-card-coche">
-                        <div style="width: 100%; height: 180px; background: #111;">
-                            <?php if(!empty($img) && file_exists($ruta_coche)): ?>
-                                <img src="<?php echo htmlspecialchars($ruta_coche); ?>" style="width: 100%; height: 100%; object-fit: cover;">
-                            <?php else: ?>
-                                <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#64748b;">Sin foto</div>
-                            <?php endif; ?>
-                        </div>
-                        <div style="padding: 15px;">
-                            <h4 style="margin:0; font-size: 1.1rem;"><?php echo htmlspecialchars($v['brand'] . " " . $v['model']); ?></h4>
-                            <div style="margin-top: 8px; font-size: 0.85rem; color: #94a3b8; display: flex; justify-content: space-between;">
-                                <span>Nota: <?php echo $v['nota_media'] ? round($v['nota_media'], 1) : '--'; ?></span>
-                                <span><?php echo $v['total_comentarios']; ?> opiniones</span>
+                    <div style="position: relative;">
+                        
+                        <?php if($mi_id == $perfil_id): ?>
+                            <!-- Botón tres puntos: stopPropagation para no activar la tarjeta -->
+                            <div style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                                <button
+                                    type="button"
+                                    onclick="toggleMenu(event, <?= $v['id']; ?>)"
+                                    style="background: rgba(0,0,0,0.7); border: none; color: white; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+                                    &#8942;
+                                </button>
+                                
+                                <div id="menu-<?= $v['id']; ?>" class="menu-dropdown">
+                                    <!-- ✅ FIX: stopPropagation en el enlace Editar para evitar que active la tarjeta -->
+                                    <a
+                                        href="edit_vehicle.php?id=<?= $v['id']; ?>"
+                                        onclick="event.stopPropagation()">
+                                        Editar
+                                    </a>
+                                    
+                                    <!-- ✅ FIX: stopPropagation en el formulario Borrar -->
+                                    <form
+                                        action="acciones/delete_vehicle.php"
+                                        method="POST"
+                                        onclick="event.stopPropagation()"
+                                        onsubmit="return confirm('¿Borrar publicación permanentemente?');"
+                                        style="margin:0;">
+                                        <input type="hidden" name="vehicle_id" value="<?= $v['id']; ?>">
+                                        <button type="submit" name="delete_btn">Borrar</button>
+                                    </form>
+                                </div>
                             </div>
-                        </div>
-                    </a>
+                        <?php endif; ?>
+
+                        <a href="comments.php?vehicle_id=<?php echo $v['id']; ?>" class="mini-card-coche">
+                            <div style="width: 100%; height: 180px; background: #111;">
+                                <?php if(!empty($img) && file_exists($ruta_coche)): ?>
+                                    <img src="<?php echo htmlspecialchars($ruta_coche); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                <?php else: ?>
+                                    <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#64748b;">Sin foto</div>
+                                <?php endif; ?>
+                            </div>
+                            <div style="padding: 15px;">
+                                <h4 style="margin:0; font-size: 1.1rem;"><?php echo htmlspecialchars($v['brand'] . " " . $v['model']); ?></h4>
+                                <div style="margin-top: 8px; font-size: 0.85rem; color: #94a3b8; display: flex; justify-content: space-between;">
+                                    <span>Nota: <?php echo $v['nota_media'] ? round($v['nota_media'], 1) : '--'; ?></span>
+                                    <span><?php echo $v['total_comentarios']; ?> opiniones</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                 <?php endforeach; ?>
             <?php else: ?>
                 <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: rgba(255,255,255,0.05); border-radius: 15px;">
@@ -281,5 +340,25 @@ $coches_usuario = $stmt_coches->fetchAll();
             <?php endif; ?>
         </div>
     </div>
+
+    <script>
+        function toggleMenu(event, id) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            // Cerrar otros menús abiertos
+            document.querySelectorAll('.menu-dropdown').forEach(m => {
+                if (m.id !== 'menu-' + id) m.style.display = 'none';
+            });
+
+            const menu = document.getElementById('menu-' + id);
+            menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        }
+
+        // Cerrar menú al hacer clic fuera
+        window.onclick = function() {
+            document.querySelectorAll('.menu-dropdown').forEach(m => m.style.display = 'none');
+        }
+    </script>
 </body>
 </html>

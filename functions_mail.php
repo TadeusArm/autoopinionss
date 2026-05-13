@@ -18,12 +18,12 @@ function enviarNotificacionEmail($emailDestino, $usernameDestino, $tipo, $extra 
     try {
         
         $mail->isSMTP();
-        $mail->Host       = 'smtp.ionos.es';
+        $mail->Host       = 'smtp de tu hosting';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'notificaciones@autoopinions.es';
-        $mail->Password   = 'Tadeuossanbaudelio29032006*';
+        $mail->Username   = 'tucorreo';
+        $mail->Password   = 'TucontraseñaSegura'; // Cambia esto por tu contraseña real
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
+        $mail->Port       = tu puerto; // Por ejemplo, 587 para TLS
         $mail->CharSet    = 'UTF-8';
         
 
@@ -36,7 +36,7 @@ function enviarNotificacionEmail($emailDestino, $usernameDestino, $tipo, $extra 
         
         if ($tipo === 'verify') {
             // Email de Registro
-            $enlace = "https://autoopinions.es/verify.php?token=" . $extra;
+            $enlace = "https://tuweb/verify.php?token=" . $extra;
             $mail->Subject = 'Confirma tu cuenta en AutoOpinions';
             $mail->Body    = "
                 <div style='font-family: Arial, sans-serif; color: #333;'>
@@ -54,7 +54,7 @@ function enviarNotificacionEmail($emailDestino, $usernameDestino, $tipo, $extra 
                     <p>Alguien ha dejado un nuevo comentario y una valoración en tu <strong>$extra</strong>.</p>
                     <p>Entra ya para ver qué opinan los demás usuarios.</p>
                     <br>
-                    <a href='https://autoopinions.es' style='color:#60a5fa;'>Ir a AutoOpinions</a>
+                    <a href='https://tuweb' style='color:#60a5fa;'>Ir a AutoOpinions</a>
                 </div>";
         }
 
