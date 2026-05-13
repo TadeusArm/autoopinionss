@@ -18,12 +18,12 @@ function enviarNotificacionEmail($emailDestino, $usernameDestino, $tipo, $extra 
     try {
         
         $mail->isSMTP();
-        $mail->Host       = 'smtp.ionos.es';
+        $mail->Host       = 'tu smtp';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'notificaciones@autoopinions.es';
-        $mail->Password   = 'Tadeuossanbaudelio29032006*';
+        $mail->Username   = 'tu correo';
+        $mail->Password   = 'Tu passwd';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
+        $mail->Port       = tu puerto;
         $mail->CharSet    = 'UTF-8';
         
 
@@ -36,7 +36,7 @@ function enviarNotificacionEmail($emailDestino, $usernameDestino, $tipo, $extra 
         
         if ($tipo === 'verify') {
             // Email de Registro
-            $enlace = "https://autoopinions.es/verificar.php?token=" . $extra;
+            $enlace = "https://tu web.es/verificar.php?token=" . $extra;
             $mail->Subject = 'Confirma tu cuenta en AutoOpinions';
             $mail->Body    = "
                 <div style='font-family: Arial, sans-serif; color: #333;'>
