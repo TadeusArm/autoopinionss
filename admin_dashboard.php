@@ -48,6 +48,7 @@ $valoresDias = array_values($datosMensuales);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitor de Sistema - AutoOpinions</title>
+    <link rel="icon" type="image/png" href="assets/img/favicon.jpg">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }

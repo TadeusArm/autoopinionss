@@ -17,15 +17,14 @@ function enviarNotificacionEmail($emailDestino, $usernameDestino, $tipo, $extra 
 
     try {
         
-        $mail->isSMTP();
-        $mail->Host       = 'tu smtp';
+         $mail->isSMTP();
+        $mail->Host       = 'smtp.ionos.es';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'tu correo';
-        $mail->Password   = 'Tu passwd';
+        $mail->Username   = 'notificaciones@autoopinions.es';
+        $mail->Password   = 'Tadeuossanbaudelio29032006*';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = tu puerto;
+        $mail->Port       = 587;
         $mail->CharSet    = 'UTF-8';
-        
 
         
         $mail->setFrom('notificaciones@autoopinions.es', 'AutoOpinions');

@@ -95,6 +95,7 @@ $lista = $st_l->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Opiniones - AutoOpinions</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" type="image/png" href="assets/img/favicon.jpg">
     <style>
         body { 
             background: url('assets/img/fondo-comments.webp') center/cover no-repeat fixed !important; 

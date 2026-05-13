@@ -69,6 +69,7 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>AutoOpinions - Siguiendo</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" type="image/png" href="assets/img/favicon.jpg">
     <style>
         body { 
             background: url('assets/img/fondo-index.jpg') center/cover no-repeat fixed !important; 
