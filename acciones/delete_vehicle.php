@@ -19,8 +19,6 @@ if (isset($_POST['delete_btn']) && isset($_SESSION['user_id'])) {
     }
 
     // 2. Borrar de la base de datos
-    // Nota: Si tienes comentarios asociados, asegúrate de que la tabla comments 
-    // tenga "ON DELETE CASCADE" o borra los comentarios primero.
     $stmt = $pdo->prepare("DELETE FROM vehicles WHERE id = ? AND user_id = ?");
     
     if ($stmt->execute([$v_id, $u_id])) {

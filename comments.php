@@ -23,14 +23,15 @@ $ya_he_opinado = $check->fetch();
 if ($_SERVER["REQUEST_METHOD"] == "POST" && !$ya_he_opinado) {
     $nota = $_POST['nota'] ?? null;
     $comentario = trim($_POST['comentario'] ?? '');
+    $parent_id = !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : null;
 
     if ($nota && !empty($comentario)) {
         try {
             $pdo->beginTransaction();
 
             // 1. Insertar comentario
-            $ins_comm = $pdo->prepare("INSERT INTO comments (user_id, vehicle_id, content) VALUES (?, ?, ?)");
-            $ins_comm->execute([$mi_id, $coche_id, $comentario]);
+           $ins_comm = $pdo->prepare("INSERT INTO comments (user_id, vehicle_id, content, parent_id) VALUES (?, ?, ?, ?)");
+    $ins_comm->execute([$mi_id, $coche_id, $comentario, $parent_id]);
 
             // 2. Insertar estrellas (rating)
             $ins_rate = $pdo->prepare("INSERT INTO ratings (user_id, vehicle_id, rating) VALUES (?, ?, ?)");
@@ -176,15 +177,39 @@ $lista = $st_l->fetchAll();
 
         <div class="bloque-glass" id="leer">
             <h3 style="margin-top:0;">Opiniones de la comunidad</h3>
-            <?php foreach($lista as $l): ?>
-                <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding: 15px 0;">
-                    <strong>@<?php echo htmlspecialchars($l['username']); ?></strong>
-                    <span style="color: #fbbf24; float: right;">
-                        <?php for($i=1; $i<=5; $i++) echo ($i <= $l['rating']) ? '★' : '☆'; ?>
-                    </span>
-                    <p><?php echo nl2br(htmlspecialchars($l['content'])); ?></p>
-                </div>
-            <?php endforeach; ?>
+            <?php foreach($lista as $l): 
+    // Si tiene parent_id, es una respuesta
+    $es_respuesta = !empty($l['parent_id']);
+?>
+    <div style="
+        border-bottom: 1px solid rgba(255,255,255,0.05); 
+        padding: 15px 0; 
+        margin-left: <?= $es_respuesta ? '40px' : '0' ?>; 
+        border-left: <?= $es_respuesta ? '2px solid #3b82f6' : 'none' ?>;
+        padding-left: <?= $es_respuesta ? '15px' : '0' ?>;">
+        
+        <strong>@<?php echo htmlspecialchars($l['username']); ?></strong>
+        
+        <?php if(!$es_respuesta): ?>
+            <span style="color: #fbbf24; float: right;">
+                <?php for($i=1; $i<=5; $i++) echo ($i <= $l['rating']) ? '★' : '☆'; ?>
+            </span>
+        <?php endif; ?>
+        
+        <p><?php echo nl2br(htmlspecialchars($l['content'])); ?></p>
+        
+        <button onclick="document.getElementById('form-<?= $l['id'] ?>').style.display='block'" 
+                style="background:none; border:none; color:#60a5fa; font-size: 0.75rem; cursor:pointer;">
+            Responder
+        </button>
+
+        <form id="form-<?= $l['id'] ?>" method="POST" style="display:none; margin-top:10px;">
+            <input type="hidden" name="parent_id" value="<?= $l['id'] ?>">
+            <textarea name="comentario" required placeholder="Escribe tu respuesta..."></textarea>
+            <button type="submit" style="font-size: 0.8rem; padding: 5px;">Enviar</button>
+        </form>
+    </div>
+<?php endforeach; ?>
         </div>
     </div>
 </body>

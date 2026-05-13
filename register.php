@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             
             if ($stmt->execute([$username, $email, $password, $token])) {
                 
-                // --- CAMBIO AQUÍ: Llamamos a la nueva función unificada ---
+               
                 // Le pasamos: el email, el nombre, el tipo 'verify' y el token
                 if (enviarNotificacionEmail($email, $username, 'verify', $token)) {
                     $message = "¡Cuenta creada! Por favor, revisa tu correo (incluyendo Spam) para activarla.";

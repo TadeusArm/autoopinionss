@@ -348,7 +348,7 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
                     $img_db = $c['image'];
                     $ruta_final = (strpos($img_db, 'assets/') === 0) ? $img_db : "assets/img/vehicles/" . $img_db;
                 ?>
-                <div class="vehicle-card">
+           <div class="vehicle-card">
     <div style="display: flex; justify-content: space-between; align-items: baseline;">
         <div>
             <span style="color: #9ca3af; font-size: 0.8rem;">Publicado por</span>
@@ -356,12 +356,20 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
                 <strong style="color: #3b82f6; display: block; font-size: 1rem;">@<?= htmlspecialchars($c['username']); ?></strong>
             </a>
         </div>
-        <span style="color: #6b7280; font-size: 0.9rem; font-weight: bold;"><?= htmlspecialchars($c['year']); ?></span>
+        
+        <div style="text-align: right;">
+            <span style="color: #6b7280; font-size: 0.9rem; font-weight: bold; display: block;"><?= htmlspecialchars($c['year']); ?></span>
+            <span style="color: #9ca3af; font-size: 0.75rem;">
+                <?= number_format($c['km'], 0, ',', '.'); ?> km | <?= htmlspecialchars($c['potencia_cv']); ?> CV
+            </span>
+        </div>
     </div>
 
     <h3 style="margin: 10px 0; font-size: 1.6rem; letter-spacing: -0.5px; color: #f8fafc;">
         <?= htmlspecialchars($c['brand'] . " " . $c['model']); ?>
     </h3>
+    
+    </div>
 
     <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
         <?= htmlspecialchars($c['description'] ?? $c['descripcion'] ?? 'Sin descripción disponible.'); ?>

@@ -14,7 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $model       = $_POST['model'];
     $year        = $_POST['year'];
     $km          = $_POST['km']; 
-    $description = $_POST['description']; // Nueva variable para la descripción
+    $potencia_cv = $_POST['potencia_cv'];
+    $description = $_POST['description'];
     $user_id     = $_SESSION['user_id'];
 
     $image_name = "";
@@ -25,10 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // INSERT con el campo description incluido
-    $sql = "INSERT INTO vehicles (brand, model, year, km, description, image, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $pdo->prepare($sql);
+    $sql = "INSERT INTO vehicles (brand, model, year, km, potencia_cv, description, image, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+$stmt = $pdo->prepare($sql);
     
-    if ($stmt->execute([$brand, $model, $year, $km, $description, $image_name, $user_id])) {
+    if ($stmt->execute([$brand, $model, $year, $km, $potencia_cv, $description, $image_name, $user_id])) {
         header("Location: index.php");
         exit;
     } else {
@@ -183,15 +184,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
 
             <div class="form-row">
-                <div class="input-group">
-                    <span class="label-text">Año</span>
-                    <input type="number" name="year" placeholder="2024" required>
-                </div>
-                <div class="input-group">
-                    <span class="label-text">Kilómetros</span>
-                    <input type="number" name="km" placeholder="0" required>
-                </div>
-            </div>
+    <div class="input-group">
+        <span class="label-text">Año</span>
+        <input type="number" name="year" placeholder="2024" required>
+    </div>
+    <div class="input-group">
+        <span class="label-text">Kilómetros</span>
+        <input type="number" name="km" placeholder="0" required>
+    </div>
+</div>
+<div class="input-group">
+    <span class="label-text">Potencia (CV)</span>
+    <input type="number" name="potencia_cv" placeholder="150" required>
+</div>
 
             <div class="input-group">
                 <span class="label-text">Descripción</span>
