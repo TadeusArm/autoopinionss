@@ -217,17 +217,16 @@ $usuarios = $stmt->fetchAll();
             <a href="admin_dashboard.php" style="
                 display: inline-flex;
                 align-items: center;
-                gap: 10px;
+                gap: 11px;
                 background: rgba(59, 130, 246, 0.15);
                 color: #3b82f6;
                 padding: 12px 30px;
-                border-radius: 12px;
+                border-radius: 14px;
                 text-decoration: none;
                 font-weight: bold;
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 font-size: 0.8rem;
-                border: none;
                 transition: 0.3s;
             " onmouseover="this.style.background='#3b82f6'; this.style.color='white';" 
                onmouseout="this.style.background='rgba(59, 130, 246, 0.15)'; this.style.color='#3b82f6';">
