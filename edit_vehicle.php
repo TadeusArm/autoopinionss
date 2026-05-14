@@ -9,9 +9,8 @@ if(!isset($_SESSION['user_id'])){
 
 $mensaje = "";
 $user_id = $_SESSION['user_id'];
-$vehicle_id = isset($_GET['id']) ? (int)$_GET['id'] : 0; // ✅ FIX: $_GET en lugar de $GET
+$vehicle_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// 1. Cargamos los datos actuales para que los inputs no estén vacíos
 $stmt_load = $pdo->prepare("SELECT * FROM vehicles WHERE id = ? AND user_id = ?");
 $stmt_load->execute([$vehicle_id, $user_id]);
 $coche = $stmt_load->fetch();
@@ -25,22 +24,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $brand       = $_POST['brand'];
     $model       = $_POST['model'];
     $year        = $_POST['year'];
-    $km          = $_POST['km']; 
+    $km          = $_POST['km'];
+    $potencia_cv = (int)$_POST['potencia_cv'];
     $description = $_POST['description'];
 
-    // Gestion de imagen: Si se sube una nueva, la guardamos y actualizamos el nombre. Si no, mantenemos la que ya estaba.
-    $image_name = $coche['image']; // Por defecto dejamos la que ya estaba
+    $image_name = $coche['image'];
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
         $image_name = time() . "_" . $user_id . "." . $ext;
         move_uploaded_file($_FILES['image']['tmp_name'], "assets/img/vehicles/" . $image_name);
     }
 
-    // UPDATE 
-    $sql = "UPDATE vehicles SET brand = ?, model = ?, year = ?, km = ?, description = ?, image = ? WHERE id = ? AND user_id = ?";
+    $sql = "UPDATE vehicles SET brand = ?, model = ?, year = ?, km = ?, potencia_cv = ?, description = ?, image = ? WHERE id = ? AND user_id = ?";
     $stmt = $pdo->prepare($sql);
     
-    if ($stmt->execute([$brand, $model, $year, $km, $description, $image_name, $vehicle_id, $user_id])) {
+    if ($stmt->execute([$brand, $model, $year, $km, $potencia_cv, $description, $image_name, $vehicle_id, $user_id])) {
         header("Location: profile.php?id=" . $user_id);
         exit;
     } else {
@@ -137,6 +135,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             gap: 20px;
         }
 
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
         .btn-submit {
             width: 100%;
             padding: 16px;
@@ -170,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         @media (max-width: 480px) {
-            .form-row { grid-template-columns: 1fr; gap: 0; }
+            .form-row, .form-row-3 { grid-template-columns: 1fr; gap: 0; }
         }
     </style>
 </head>
@@ -198,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="form-row-3">
                 <div class="input-group">
                     <span class="label-text">Año</span>
                     <input type="number" name="year" value="<?= htmlspecialchars($coche['year']) ?>" required>
@@ -206,6 +210,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="input-group">
                     <span class="label-text">Kilómetros</span>
                     <input type="number" name="km" value="<?= htmlspecialchars($coche['km']) ?>" required>
+                </div>
+                <div class="input-group">
+                    <span class="label-text">Potencia (CV)</span>
+                    <input type="number" name="potencia_cv" value="<?= htmlspecialchars($coche['potencia_cv'] ?? '') ?>" min="1" max="2000">
                 </div>
             </div>
 

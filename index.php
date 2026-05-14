@@ -16,6 +16,8 @@ $min_year = $_GET['min_year'] ?? '';
 $max_year = $_GET['max_year'] ?? '';
 $min_km = $_GET['min_km'] ?? '';
 $max_km = $_GET['max_km'] ?? '';
+$min_cv = $_GET['min_cv'] ?? '';
+$max_cv = $_GET['max_cv'] ?? '';
 
 // 2. SQL DINÁMICO
 $sql = "SELECT v.*, u.username, 
@@ -32,6 +34,8 @@ if (!empty($min_year)) { $sql .= " AND v.year >= ?"; $params[] = (int)$min_year;
 if (!empty($max_year)) { $sql .= " AND v.year <= ?"; $params[] = (int)$max_year; }
 if (!empty($min_km)) { $sql .= " AND v.km >= ?"; $params[] = (int)$min_km; }
 if (!empty($max_km)) { $sql .= " AND v.km <= ?"; $params[] = (int)$max_km; }
+if (!empty($min_cv)) { $sql .= " AND v.potencia_cv >= ?"; $params[] = (int)$min_cv; }
+if (!empty($max_cv)) { $sql .= " AND v.potencia_cv <= ?"; $params[] = (int)$max_cv; }
 
 $sql .= " ORDER BY v.id DESC";
 $stmt = $pdo->prepare($sql);
@@ -52,16 +56,10 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
     <style>
         body { 
             background: url('assets/img/fondo-index.jpg') center/cover no-repeat fixed !important; 
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
         }
 
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
+        header { position: fixed; top: 0; width: 100%; z-index: 1000; }
 
         .sidebar-left {
             width: 300px;
@@ -71,8 +69,7 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
             padding: 30px 20px;
             height: 100vh;
             position: fixed;
-            left: 0;
-            top: 0; 
+            left: 0; top: 0; 
             padding-top: 90px; 
             z-index: 900;
             overflow-y: auto;
@@ -117,20 +114,14 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
             position: relative;
             z-index: 2;
             width: auto; 
-            margin-top: 40px; 
+            margin-top: 35px;
             padding: 0 20px;
-            
-            /* Magia para centrar el contenido en este espacio: */
             display: flex;
             flex-direction: column;
             align-items: center; 
         }
 
-        /* Evitamos que las tarjetas y títulos se estiren demasiado */
-        .feed-container > * {
-            width: 100%;
-            max-width: 700px;
-        }
+        .feed-container > * { width: 100%; max-width: 700px; }
 
         .vehicle-card { 
             margin-bottom: 40px; 
@@ -172,73 +163,44 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
         .btn-azul { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; }
         .btn-gris { background: rgba(255, 255, 255, 0.1); color: #cbd5e1; }
 
+        #scrollToTop { display: none; }
 
-.nav-header {
-    position: fixed; 
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    background: rgba(17, 24, 39, 0.85); 
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 12px 0;
-}
-
-
-#scrollToTop {
-    display: none ; 
-}
-
-/* AJUSTES EXCLUSIVOS PARA MÓVIL (Menos de 768px) */
-@media (max-width: 768px) {
-    
-    .nav-header {
-        position: relative !important; 
-    }
-
-    #scrollToTop#scrollToTop {
-        display: none; 
-        position: fixed !important;
-        bottom: 25px !important;
-        right: 25px !important;
-        width: 55px !important;
-        height: 55px !important;
-        background-image: url('assets/img/flecha.jpg') !important;
-        background-size: cover !important;
-        background-position: center !important;
-        border: none !important;
-        border-radius: 45% ;
-        z-index: 99999 ;
-        
-        /* EFECTO FANTASMA POR DEFECTO */
-        opacity: 0.5 ; 
-        filter: brightness(1);
-        transition: all 0.2s ease-in-out ;
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    /* EFECTO BRILLO AL TOCAR */
-    #scrollToTop#scrollToTop:active {
-        opacity: 0.5t; 
-        filter: brightness(1.8) drop-shadow(0 0 15px #3b82f6) !important; 
-        transform: scale(1.2) !important;
-    }
-}
-
-        /* === CORRECCIONES PARA MÓVIL === */
         @media (max-width: 768px) {
+            .nav-header { position: relative !important; }
+
+            #scrollToTop#scrollToTop {
+                display: none; 
+                position: fixed !important;
+                bottom: 25px !important;
+                right: 25px !important;
+                width: 55px !important;
+                height: 55px !important;
+                background-image: url('assets/img/flecha.jpg') !important;
+                background-size: cover !important;
+                background-position: center !important;
+                border: none !important;
+                border-radius: 45%;
+                z-index: 99999;
+                opacity: 0.5; 
+                transition: all 0.2s ease-in-out;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            #scrollToTop#scrollToTop:active {
+                opacity: 1; 
+                filter: brightness(1.8) drop-shadow(0 0 15px #3b82f6) !important; 
+                transform: scale(1.2) !important;
+            }
+
             .sidebar-left {
                 position: relative !important; 
                 width: 100% !important;
                 height: auto !important;
-                padding-top: 0px ; 
-                padding-bottom: 20px !important;
+                padding-top: 20px;
                 border-right: none;
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
-            
+
             .feed-container { 
                 margin-left: 0 !important; 
                 width: 100% !important; 
@@ -247,26 +209,8 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
             }
 
             .range-container { grid-template-columns: 1fr; }
-
-            .img-wrapper {
-                height: 220px; /* Las imágenes no se verán gigantes en móvil */
-            }
-            
-            .vehicle-card {
-                padding: 15px;
-            }
+            .img-wrapper { height: 220px; }
         }
-        /* Dentro de la etiqueta <style> de index.php */
-.feed-container {
-    margin-top: 100px; /* Espacio para que el header fijo no tape el título en PC */
-    /* ... resto de tu código ... */
-}
-
-@media (max-width: 768px) {
-    .feed-container {
-        margin-top: 20px !important; /* En móvil, como el header no es fijo, no hace falta tanto margen */
-    }
-}
     </style>
 </head>
 <body>
@@ -328,6 +272,24 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
                 </div>
             </div>
 
+            <div class="filter-group">
+                <label>Potencia (CV) (Mín - Máx)</label>
+                <div class="range-container">
+                    <select name="min_cv">
+                        <option value="">Mín</option>
+                        <?php for($i=10; $i<=500; $i+=10): ?>
+                            <option value="<?= $i ?>" <?= ($min_cv == $i)?'selected':'' ?>><?= $i ?> CV</option>
+                        <?php endfor; ?>
+                    </select>
+                    <select name="max_cv">
+                        <option value="">Máx</option>
+                        <?php for($i=10; $i<=500; $i+=10): ?>
+                            <option value="<?= $i ?>" <?= ($max_cv == $i)?'selected':'' ?>><?= $i ?> CV</option>
+                        <?php endfor; ?>
+                    </select>
+                </div>
+            </div>
+
             <button type="submit" class="btn-filter">ACTUALIZAR</button>
             <a href="index.php" style="display:block; text-align:center; margin-top:15px; color:#64748b; font-size:0.75rem; text-decoration:none;">Limpiar filtros</a>
         </form>
@@ -348,82 +310,73 @@ $todas_las_marcas = $marcas_query->fetchAll(PDO::FETCH_COLUMN);
                     $img_db = $c['image'];
                     $ruta_final = (strpos($img_db, 'assets/') === 0) ? $img_db : "assets/img/vehicles/" . $img_db;
                 ?>
-           <div class="vehicle-card">
-    <div style="display: flex; justify-content: space-between; align-items: baseline;">
-        <div>
-            <span style="color: #9ca3af; font-size: 0.8rem;">Publicado por</span>
-            <a href="profile.php?id=<?= $c['user_id']; ?>" style="text-decoration: none;">
-                <strong style="color: #3b82f6; display: block; font-size: 1rem;">@<?= htmlspecialchars($c['username']); ?></strong>
-            </a>
-        </div>
-        
-        <div style="text-align: right;">
-            <span style="color: #6b7280; font-size: 0.9rem; font-weight: bold; display: block;"><?= htmlspecialchars($c['year']); ?></span>
-            <span style="color: #9ca3af; font-size: 0.75rem;">
-                <?= number_format($c['km'], 0, ',', '.'); ?> km | <?= htmlspecialchars($c['potencia_cv']); ?> CV
-            </span>
-        </div>
-    </div>
+                <div class="vehicle-card">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                        <div>
+                            <span style="color: #9ca3af; font-size: 0.8rem;">Publicado por</span>
+                            <a href="profile.php?id=<?= $c['user_id']; ?>" style="text-decoration: none;">
+                                <strong style="color: #3b82f6; display: block; font-size: 1rem;">@<?= htmlspecialchars($c['username']); ?></strong>
+                            </a>
+                        </div>
+                        
+                        <div style="text-align: right;">
+                            <span style="color: #6b7280; font-size: 0.9rem; font-weight: bold; display: block;">
+                                <?= htmlspecialchars($c['year']); ?>
+                            </span>
+                            <span style="color: #9ca3af; font-size: 0.75rem;">
+                                <?= number_format($c['km'], 0, ',', '.'); ?> km | <?= htmlspecialchars($c['potencia_cv']); ?> CV
+                            </span>
+                        </div>
+                    </div>
 
-    <h3 style="margin: 10px 0; font-size: 1.6rem; letter-spacing: -0.5px; color: #f8fafc;">
-        <?= htmlspecialchars($c['brand'] . " " . $c['model']); ?>
-    </h3>
-    
-    </div>
+                    <h3 style="margin: 10px 0; font-size: 1.6rem; letter-spacing: -0.5px; color: #f8fafc;">
+                        <?= htmlspecialchars($c['brand'] . " " . $c['model']); ?>
+                    </h3>
 
-    <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
-        <?= htmlspecialchars($c['description'] ?? $c['descripcion'] ?? 'Sin descripción disponible.'); ?>
-    </p>
-    
-    <div class="img-wrapper">
-        <?php if(!empty($img_db)): ?>
-            <img src="<?= htmlspecialchars($ruta_final); ?>" alt="Vehículo">
-        <?php else: ?>
-            <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2);">
-                <p style="color: #64748b; font-size: 0.9rem;">Imagen no disponible</p>
-            </div>
-        <?php endif; ?>
-    </div>
+                    <p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+                        <?= htmlspecialchars($c['description'] ?? $c['descripcion'] ?? 'Sin descripción disponible.'); ?>
+                    </p>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; margin-bottom: 15px;">
-        <div class="stats-badge" style="color:#fff; margin-bottom: 0;">
-             <span style="color: #fbbf24; font-weight: bold;"><?= $c['nota_media'] ? round($c['nota_media'], 1) : '---'; ?></span> 
-            <span style="margin: 0 5px; opacity: 0.3;">|</span>
-             <?= $c['total_comentarios']; ?> opiniones
-        </div>
-    </div>
+                    <div class="img-wrapper">
+                        <?php if(!empty($img_db)): ?>
+                            <img src="<?= htmlspecialchars($ruta_final); ?>" alt="Vehículo">
+                        <?php else: ?>
+                            <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2);">
+                                <p style="color: #64748b; font-size: 0.9rem;">Imagen no disponible</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
 
-    <?php if($ya_opino): ?>
-        <a href="comments.php?vehicle_id=<?= $c['id']; ?>#leer" class="btn-gris">Ver opiniones</a>
-    <?php else: ?>
-        <a href="comments.php?vehicle_id=<?= $c['id']; ?>" class="btn-azul">Opinar y ver detalles</a>
-    <?php endif; ?>
-</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; margin-bottom: 15px;">
+                        <div class="stats-badge" style="color:#fff; margin-bottom: 0;">
+                            <span style="color: #fbbf24; font-weight: bold;"><?= $c['nota_media'] ? round($c['nota_media'], 1) : '---'; ?></span> 
+                            <span style="margin: 0 5px; opacity: 0.3;">|</span>
+                            <?= $c['total_comentarios']; ?> opiniones
+                        </div>
+                    </div>
+
+                    <?php if($ya_opino): ?>
+                        <a href="comments.php?vehicle_id=<?= $c['id']; ?>#leer" class="btn-gris">Ver opiniones</a>
+                    <?php else: ?>
+                        <a href="comments.php?vehicle_id=<?= $c['id']; ?>" class="btn-azul">Opinar y ver detalles</a>
+                    <?php endif; ?>
+                </div>
             <?php endforeach; ?>
         <?php else: ?>
             <p style="color: #94a3b8; font-size: 1rem; margin-top: 50px;">No se encontraron vehículos que coincidan con los filtros.</p>
         <?php endif; ?>
+    </div>
 
     <button type="button" id="scrollToTop" title="Ir arriba"></button>
 
     <script>
-      const scrollBtn = document.getElementById("scrollToTop");
-    
-    window.onscroll = function() {
-        const isMobile = window.innerWidth <= 768;
-        const dist = document.body.scrollTop > 300 || document.documentElement.scrollTop > 300;
-
-        if (isMobile && dist) {
-            scrollBtn.style.display = "block";
-        } else {
-            scrollBtn.style.display = "none";
-        }
-    };
-
-    scrollBtn.onclick = function() {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    };
+        const scrollBtn = document.getElementById("scrollToTop");
+        window.onscroll = function() {
+            const isMobile = window.innerWidth <= 768;
+            const dist = document.body.scrollTop > 300 || document.documentElement.scrollTop > 300;
+            if (isMobile && dist) { scrollBtn.style.display = "block"; } else { scrollBtn.style.display = "none"; }
+        };
+        scrollBtn.onclick = function() { window.scrollTo({ top: 0, behavior: "smooth" }); };
     </script>
-   
 </body>
 </html>
